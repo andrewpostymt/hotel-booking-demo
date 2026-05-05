@@ -14,8 +14,6 @@ localResources:
     - ../postman/environments/nonprod-qa.postman_environment.json
     - ../postman/environments/nonprod-stage.postman_environment.json
     - ../postman/environments/nonprod-preprod.postman_environment.json
-  specs:
-    - ../room-booking-core-services.openapi.yaml
 cloudResources:
   collections:
     ../postman/collections/[Baseline] room-booking-core-services: 54514825-258e4ab7-a6b1-47b3-bb30-4c53d687a892
@@ -30,5 +28,3 @@ cloudResources:
     ../postman/environments/nonprod-qa.postman_environment.json: 54514825-924abd1a-e366-4b9f-8d6d-a69d933a5e83
     ../postman/environments/nonprod-stage.postman_environment.json: 54514825-bcffb744-4946-485d-8b34-5ee835b89b3c
     ../postman/environments/nonprod-preprod.postman_environment.json: 54514825-11cc72bf-04d2-4d0f-baba-5bbb41e6bc33
-  specs:
-    ../room-booking-core-services.openapi.yaml: 5a2077f5-c00f-4669-a708-7d56e53ba95e
