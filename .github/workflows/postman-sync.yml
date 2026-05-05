@@ -22,8 +22,8 @@ jobs:
         with:
           project-name: ${{ github.event.inputs.project-name }}
           workspace-id: 8efae25c-c592-46ce-89f7-7102faef61e8
-          baseline-collection-id: 54514825-bfa7f9d8-afef-4e90-916b-e6b2cae941c1
-          smoke-collection-id: 54514825-5686dfe5-ff2b-4e41-8699-d9edf344f7ab
+          baseline-collection-id: 54514825-73cb7b6a-6dd5-4ff3-a3dd-30aec2d86b72
+          smoke-collection-id: 54514825-d75e7a61-6cec-4385-9807-7056e71fd9ae
           contract-collection-id: 54514825-90cdbdf7-06c8-4b70-9d32-74f0f7bbaaa6
           environments-json: '["dev","qa2","qa4","preprod","nonprod-dev","nonprod-qa","nonprod-stage","nonprod-preprod"]'
           environment-uids-json: '{"dev":"54514825-9c5d6d2d-9de1-4669-9140-89b894a6929a","qa2":"54514825-8ad55274-4f94-4631-8232-31a176d623a0","qa4":"54514825-f408c436-7f9b-426d-a178-b542658255e1","preprod":"54514825-5cf52355-675b-4388-a812-ed13aaa84a4b","nonprod-dev":"54514825-01c35951-1bfc-459b-a891-66b33b007866","nonprod-qa":"54514825-924abd1a-e366-4b9f-8d6d-a69d933a5e83","nonprod-stage":"54514825-bcffb744-4946-485d-8b34-5ee835b89b3c","nonprod-preprod":"54514825-11cc72bf-04d2-4d0f-baba-5bbb41e6bc33"}'

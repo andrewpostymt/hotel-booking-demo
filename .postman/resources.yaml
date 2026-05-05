@@ -21,7 +21,7 @@ cloudResources:
   collections:
     ../postman/collections/[Baseline] room-booking-core-services: 54514825-73cb7b6a-6dd5-4ff3-a3dd-30aec2d86b72
     ../postman/collections/[Smoke] room-booking-core-services: 54514825-d75e7a61-6cec-4385-9807-7056e71fd9ae
-    ../postman/collections/[Contract] room-booking-core-services: 54514825-1e6bbc42-6a42-4b7c-b245-9365f84d7fce
+    ../postman/collections/[Contract] room-booking-core-services: 54514825-90cdbdf7-06c8-4b70-9d32-74f0f7bbaaa6
   environments:
     ../postman/environments/dev.postman_environment.json: 54514825-9c5d6d2d-9de1-4669-9140-89b894a6929a
     ../postman/environments/qa2.postman_environment.json: 54514825-8ad55274-4f94-4631-8232-31a176d623a0
