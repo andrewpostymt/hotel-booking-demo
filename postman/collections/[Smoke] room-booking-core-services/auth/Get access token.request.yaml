@@ -1,0 +1,28 @@
+type: http
+name: Get access token
+url: '{{baseUrl}}/auth/token'
+method: POST
+headers:
+  - key: Content-Type
+    value: application/x-www-form-urlencoded
+body:
+  type: urlencoded
+  content:
+    - key: grant_type
+      value: client_credentials
+    - key: scope
+      value: room-booking:read room-booking:write
+scripts:
+  - type: afterResponse
+    code:
+      - pm.test('Status code is successful (2xx)', function () {
+      - '    pm.response.to.be.success;'
+      - '});'
+    language: text/javascript
+examples:
+  - response:
+      statusCode: 200
+      body: '{"access_token":"ci-mock-token","token_type":"Bearer","expires_in":3600}'
+      headers:
+        - key: Content-Type
+          value: application/json

@@ -27,6 +27,7 @@ variables:
     value: https://dev-api.example-hospitality.com/room-booking/v3
     type: any
 items:
+  - ref: ./auth/folder.yaml
   - ref: ./health/folder.yaml
   - ref: ./availability/folder.yaml
   - ref: ./pricing/folder.yaml
