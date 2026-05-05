@@ -27,6 +27,7 @@ jobs:
           project-name: ${{ github.event.inputs.project-name }}
           spec-url: ${{ github.event.inputs.spec-url }}
           workspace-id: 8efae25c-c592-46ce-89f7-7102faef61e8
+          spec-id: 1aede16a-9499-45cb-9234-009ea7726cf3
           baseline-collection-id: ''
           smoke-collection-id: ''
           contract-collection-id: ''
