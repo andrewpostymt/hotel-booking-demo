@@ -79,14 +79,14 @@ examples:
         content: |-
           {
             "confirmationNumber": "string",
-            "status": "CANCELLED",
+            "status": "MODIFIED",
             "propertyId": "string",
             "roomTypeCode": "string",
-            "checkIn": "1990-09-24",
-            "checkOut": "2004-04-16",
-            "totalDue": 227.51796549250525,
-            "createdAt": "1987-04-28T19:00:28.988Z",
-            "modifiedAt": "2022-09-24T19:27:10.088Z"
+            "checkIn": "1957-12-03",
+            "checkOut": "1974-07-30",
+            "totalDue": 5247.989657906809,
+            "createdAt": "1994-06-25T14:20:14.735Z",
+            "modifiedAt": "1991-06-03T13:30:20.488Z"
           }
       headers:
         - key: Content-Type
