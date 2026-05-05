@@ -22,7 +22,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - id: bootstrap
-        uses: postman-cs/postman-bootstrap-action@v0
+        uses: postman-cs/postman-bootstrap-action@main
         with:
           project-name: ${{ github.event.inputs.project-name }}
           spec-url: ${{ github.event.inputs.spec-url }}
