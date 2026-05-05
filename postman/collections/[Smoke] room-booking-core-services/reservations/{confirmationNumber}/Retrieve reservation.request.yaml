@@ -36,14 +36,14 @@ examples:
         content: |-
           {
             "confirmationNumber": "string",
-            "status": "PENDING",
+            "status": "MODIFIED",
             "propertyId": "string",
             "roomTypeCode": "string",
-            "checkIn": "2004-04-25",
-            "checkOut": "1994-03-08",
-            "totalDue": 5296.542818577592,
-            "createdAt": "1983-02-25T12:58:49.188Z",
-            "modifiedAt": "2020-02-24T05:47:14.997Z"
+            "checkIn": "2010-04-08",
+            "checkOut": "2021-03-02",
+            "totalDue": 5567.127530618365,
+            "createdAt": "2020-03-19T08:48:40.495Z",
+            "modifiedAt": "2005-03-14T05:27:16.932Z"
           }
       headers:
         - key: Content-Type

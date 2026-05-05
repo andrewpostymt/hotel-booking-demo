@@ -9,7 +9,7 @@ description: |-
   Contact Support:
    Name: Room Booking Services Team
    Email: api-team@example-hospitality.com
-id: 5686dfe5-ff2b-4e41-8699-d9edf344f7ab
+id: d75e7a61-6cec-4385-9807-7056e71fd9ae
 auth:
   type: oauth2
   credentials:
@@ -27,7 +27,6 @@ variables:
     value: https://dev-api.example-hospitality.com/room-booking/v3
     type: any
 items:
-  - ref: ./auth/folder.yaml
   - ref: ./health/folder.yaml
   - ref: ./availability/folder.yaml
   - ref: ./pricing/folder.yaml

@@ -21,11 +21,11 @@ examples:
             "status": "MODIFIED",
             "propertyId": "string",
             "roomTypeCode": "string",
-            "checkIn": "1980-08-12",
-            "checkOut": "1994-07-06",
-            "totalDue": 4939.726148851698,
-            "createdAt": "1987-10-15T08:33:45.935Z",
-            "modifiedAt": "2025-10-17T05:16:37.978Z"
+            "checkIn": "1978-11-09",
+            "checkOut": "2012-07-07",
+            "totalDue": 9923.57349578079,
+            "createdAt": "1999-05-21T14:33:04.758Z",
+            "modifiedAt": "1958-09-07T13:09:28.647Z"
           }
       headers:
         - key: Content-Type

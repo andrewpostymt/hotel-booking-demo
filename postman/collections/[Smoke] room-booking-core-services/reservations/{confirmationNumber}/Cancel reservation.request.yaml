@@ -1,13 +1,13 @@
 type: http
 name: Cancel reservation
-url: '{{baseUrl}}/reservations/:confirmationNumber?reason=WEATHER'
+url: '{{baseUrl}}/reservations/:confirmationNumber?reason=OTHER'
 method: DELETE
 headers:
   - key: Accept
     value: application/json
 queryParams:
   - key: reason
-    value: WEATHER
+    value: OTHER
     description: Cancellation reason code for reporting.
 pathVariables:
   - key: confirmationNumber

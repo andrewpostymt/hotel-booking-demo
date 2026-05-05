@@ -1,6 +1,6 @@
 type: http
 name: Search rate plans
-url: '{{baseUrl}}/pricing/rate-plans?propertyId=GRAND-HOTEL-LV&checkIn=2026-06-01&checkOut=2026-06-03&segment=MLIFE'
+url: '{{baseUrl}}/pricing/rate-plans?propertyId=GRAND-HOTEL-LV&checkIn=2026-06-01&checkOut=2026-06-03&segment=CORPORATE'
 method: GET
 headers:
   - key: Accept
@@ -16,7 +16,7 @@ queryParams:
     value: '2026-06-03'
     description: Check-out date in YYYY-MM-DD format. Must be after checkIn.
   - key: segment
-    value: MLIFE
+    value: CORPORATE
     description: Guest segment filter (e.g. LEISURE, CORPORATE, GROUP).
 scripts:
   - type: afterResponse

@@ -15,23 +15,23 @@ body:
   type: json
   content: |-
     {
-      "checkIn": "1951-12-17",
-      "checkOut": "2004-10-16",
+      "checkIn": "2023-01-21",
+      "checkOut": "2008-03-24",
       "roomTypeCode": "string",
       "guests": {
-        "adults": 5822,
-        "children": 2603
+        "adults": 7474,
+        "children": 3556
       },
       "addOns": [
         {
           "code": "RESORT-FEE",
           "description": "string",
-          "amount": 4585.426547325553
+          "amount": 2591.6581760233903
         },
         {
           "code": "RESORT-FEE",
           "description": "string",
-          "amount": 1196.8089721464792
+          "amount": 2903.5106529441678
         }
       ],
       "specialRequests": "string"
@@ -106,14 +106,14 @@ examples:
         content: |-
           {
             "confirmationNumber": "string",
-            "status": "MODIFIED",
+            "status": "CANCELLED",
             "propertyId": "string",
             "roomTypeCode": "string",
-            "checkIn": "1957-12-03",
-            "checkOut": "1974-07-30",
-            "totalDue": 5247.989657906809,
-            "createdAt": "1994-06-25T14:20:14.735Z",
-            "modifiedAt": "1991-06-03T13:30:20.488Z"
+            "checkIn": "1976-01-23",
+            "checkOut": "2016-02-28",
+            "totalDue": 1524.6263150007744,
+            "createdAt": "1956-11-24T21:51:25.440Z",
+            "modifiedAt": "1980-11-08T01:26:52.334Z"
           }
       headers:
         - key: Content-Type
