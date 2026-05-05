@@ -6,11 +6,11 @@ on:
       project-name:
         description: 'Service project name'
         required: true
-        default: 'recommendation-service'
+        default: 'room-booking-core-services'
       spec-url:
         description: 'OpenAPI spec URL (must be HTTPS)'
         required: true
-        default: 'https://raw.githubusercontent.com/andrewpostymt/hotel-booking-demo/main/recommendation-service.openapi.yaml'
+        default: 'https://raw.githubusercontent.com/andrewpostymt/hotel-booking-demo/main/room-booking-core-services.openapi.yaml'
 
 permissions:
   contents: read
