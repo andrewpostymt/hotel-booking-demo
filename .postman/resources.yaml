@@ -17,6 +17,7 @@ localResources:
   specs:
     - ../room-booking-core-services.openapi.yaml
     - ../recommendation-service.openapi.yaml
+    - ../entertainment-nightlife-reservations.openapi.yaml
 cloudResources:
   collections:
     ../postman/collections/[Baseline] room-booking-core-services: 54514825-fc7f807e-0fbc-453b-acca-6c5b1265cf9a

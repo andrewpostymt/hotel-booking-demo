@@ -1,0 +1,416 @@
+openapi: 3.1.0
+info:
+  title: Entertainment & Nightlife Reservations
+  version: 1.0.0
+  description: >
+    Core API for managing entertainment and nightlife reservations across
+    hotel properties. Handles event synchronisation with the Opera PMS,
+    rate plan lookups, and resync operations for stale or failed event records.
+  contact:
+    name: API Platform Team
+    email: api-team@example-hospitality.com
+  x-api-owner: entertainment-platform-team
+
+servers:
+  - url: https://dev-api.apigee.devtest.vegas/entertainment
+    description: Dev (Apigee)
+  - url: https://qa2-api.apigee.devtest.vegas/entertainment
+    description: QA2 (Apigee)
+  - url: https://qa4-api.apigee.devtest.vegas/entertainment
+    description: QA4 (Apigee)
+  - url: https://preprod-api.apigee.devtest.vegas/entertainment
+    description: Preprod (Apigee devtest)
+  - url: https://mgm-nonprod-dev.apigee.net/entertainment
+    description: NonProd Dev
+  - url: https://mgm-nonprod-qa.apigee.net/entertainment
+    description: NonProd QA
+  - url: https://mgm-nonprod-stage.apigee.net/entertainment
+    description: NonProd Stage
+  - url: https://mgm-nonprod-preprod.apigee.net/entertainment
+    description: NonProd Preprod
+
+security:
+  - oauth2: []
+
+paths:
+  /events/sync:
+    post:
+      operationId: syncEvents
+      summary: Sync events from Opera PMS
+      description: >
+        Triggers a full synchronisation of entertainment events from the Opera
+        PMS into the reservations platform. Idempotent — safe to call repeatedly.
+      tags:
+        - Events
+      x-api-owner: entertainment-platform-team
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventSyncRequest'
+            example:
+              propertyId: GRAND-HOTEL-LV
+              syncFrom: '2026-06-01'
+              syncTo: '2026-12-31'
+      responses:
+        '202':
+          description: Sync job accepted and queued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SyncJobResponse'
+              example:
+                jobId: sync-20260601-001
+                status: QUEUED
+                propertyId: GRAND-HOTEL-LV
+                queuedAt: '2026-05-05T21:00:00Z'
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Missing or invalid OAuth2 token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /events/resync:
+    post:
+      operationId: resyncEvents
+      summary: Resync failed or stale event records
+      description: >
+        Re-triggers synchronisation for event records that failed or became stale
+        during a previous sync operation. Accepts a list of specific event IDs or
+        a date range to resync in bulk.
+      tags:
+        - Events
+      x-api-owner: entertainment-platform-team
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventResyncRequest'
+            example:
+              propertyId: GRAND-HOTEL-LV
+              eventIds:
+                - EVT-2026-4421
+                - EVT-2026-4422
+      responses:
+        '202':
+          description: Resync job accepted and queued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SyncJobResponse'
+              example:
+                jobId: resync-20260601-002
+                status: QUEUED
+                propertyId: GRAND-HOTEL-LV
+                queuedAt: '2026-05-05T21:05:00Z'
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Missing or invalid OAuth2 token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: One or more event IDs not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /opera/retrieve:
+    get:
+      operationId: retrieveOperaEvent
+      summary: Retrieve event details from Opera PMS
+      description: >
+        Fetches the current state of a specific event or block of events directly
+        from the Opera PMS. Used to validate sync accuracy or diagnose discrepancies.
+      tags:
+        - Opera PMS
+      x-api-owner: entertainment-platform-team
+      parameters:
+        - name: propertyId
+          in: query
+          required: true
+          description: Hotel property identifier.
+          schema:
+            type: string
+          example: GRAND-HOTEL-LV
+        - name: eventId
+          in: query
+          required: false
+          description: Specific Opera event ID to retrieve. Returns all events for the property if omitted.
+          schema:
+            type: string
+          example: EVT-2026-4421
+        - name: dateFrom
+          in: query
+          required: false
+          description: Start of date range for event lookup (YYYY-MM-DD).
+          schema:
+            type: string
+            format: date
+          example: '2026-06-01'
+        - name: dateTo
+          in: query
+          required: false
+          description: End of date range for event lookup (YYYY-MM-DD).
+          schema:
+            type: string
+            format: date
+          example: '2026-06-30'
+      responses:
+        '200':
+          description: Event details returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OperaEventResponse'
+              example:
+                propertyId: GRAND-HOTEL-LV
+                events:
+                  - eventId: EVT-2026-4421
+                    name: The Residency — Main Stage
+                    venue: Grand Theater
+                    startDate: '2026-06-14'
+                    endDate: '2026-06-14'
+                    status: CONFIRMED
+                    capacity: 1200
+                    available: 843
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Missing or invalid OAuth2 token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Event not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /rateplans/search:
+    get:
+      operationId: searchRatePlans
+      summary: Search entertainment rate plans
+      description: >
+        Returns available rate plans for entertainment packages at a given property.
+        Rate plans govern pricing for show + room bundle offers surfaced in the
+        booking flow.
+      tags:
+        - Rate Plans
+      x-api-owner: entertainment-platform-team
+      parameters:
+        - name: propertyId
+          in: query
+          required: true
+          description: Hotel property identifier.
+          schema:
+            type: string
+          example: GRAND-HOTEL-LV
+        - name: eventId
+          in: query
+          required: false
+          description: Filter rate plans associated with a specific event.
+          schema:
+            type: string
+          example: EVT-2026-4421
+        - name: checkIn
+          in: query
+          required: false
+          description: Check-in date for bundle rate plan lookup (YYYY-MM-DD).
+          schema:
+            type: string
+            format: date
+          example: '2026-06-14'
+        - name: checkOut
+          in: query
+          required: false
+          description: Check-out date for bundle rate plan lookup (YYYY-MM-DD).
+          schema:
+            type: string
+            format: date
+          example: '2026-06-15'
+      responses:
+        '200':
+          description: Rate plans returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RatePlanSearchResponse'
+              example:
+                propertyId: GRAND-HOTEL-LV
+                ratePlans:
+                  - code: ENT-SHOW-INCL
+                    name: Show Inclusive Package
+                    description: Room rate inclusive of two show tickets
+                    baseRate: 399
+                    currency: USD
+                    includes:
+                      - showTickets: 2
+                        eventId: EVT-2026-4421
+                  - code: ENT-SHOW-OPT
+                    name: Show Optional Package
+                    description: Room rate with optional show ticket add-on
+                    baseRate: 289
+                    currency: USD
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Missing or invalid OAuth2 token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    oauth2:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: https://dev-api.apigee.devtest.vegas/oauth/token
+          scopes:
+            entertainment:read: Read entertainment events and rate plans
+            entertainment:write: Trigger sync and resync operations
+
+  schemas:
+    EventSyncRequest:
+      type: object
+      required:
+        - propertyId
+        - syncFrom
+      properties:
+        propertyId:
+          type: string
+          description: Hotel property identifier.
+        syncFrom:
+          type: string
+          format: date
+          description: Start date for sync window (YYYY-MM-DD).
+        syncTo:
+          type: string
+          format: date
+          description: End date for sync window. Defaults to 90 days from syncFrom if omitted.
+
+    EventResyncRequest:
+      type: object
+      required:
+        - propertyId
+      properties:
+        propertyId:
+          type: string
+          description: Hotel property identifier.
+        eventIds:
+          type: array
+          items:
+            type: string
+          description: Specific event IDs to resync. If omitted, all failed events for the property are resynced.
+
+    SyncJobResponse:
+      type: object
+      properties:
+        jobId:
+          type: string
+          description: Unique identifier for the queued sync job.
+        status:
+          type: string
+          enum: [QUEUED, RUNNING, COMPLETED, FAILED]
+          description: Current status of the sync job.
+        propertyId:
+          type: string
+        queuedAt:
+          type: string
+          format: date-time
+
+    OperaEventResponse:
+      type: object
+      properties:
+        propertyId:
+          type: string
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/OperaEvent'
+
+    OperaEvent:
+      type: object
+      properties:
+        eventId:
+          type: string
+        name:
+          type: string
+        venue:
+          type: string
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+        status:
+          type: string
+          enum: [CONFIRMED, TENTATIVE, CANCELLED]
+        capacity:
+          type: integer
+        available:
+          type: integer
+
+    RatePlanSearchResponse:
+      type: object
+      properties:
+        propertyId:
+          type: string
+        ratePlans:
+          type: array
+          items:
+            $ref: '#/components/schemas/EntertainmentRatePlan'
+
+    EntertainmentRatePlan:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Rate plan code.
+        name:
+          type: string
+          description: Display name for the rate plan.
+        description:
+          type: string
+        baseRate:
+          type: number
+          format: float
+        currency:
+          type: string
+
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
