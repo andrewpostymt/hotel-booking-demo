@@ -27,10 +27,9 @@ jobs:
           project-name: ${{ github.event.inputs.project-name }}
           spec-url: ${{ github.event.inputs.spec-url }}
           workspace-id: 8efae25c-c592-46ce-89f7-7102faef61e8
-          spec-id: cf94d336-f13d-446b-9d1c-a760e11eb59b
-          baseline-collection-id: 54514825-73cb7b6a-6dd5-4ff3-a3dd-30aec2d86b72
-          smoke-collection-id: 54514825-d75e7a61-6cec-4385-9807-7056e71fd9ae
-          contract-collection-id: 54514825-90cdbdf7-06c8-4b70-9d32-74f0f7bbaaa6
+          baseline-collection-id: ''
+          smoke-collection-id: ''
+          contract-collection-id: ''
           domain: booking-services
           domain-code: RBS
           governance-mapping-json: '{"booking-services":"Booking Services"}'
