@@ -1,0 +1,128 @@
+type: http
+name: Get room availability calendar
+url: '{{baseUrl}}/availability/calendar?propertyId=GRAND-HOTEL-LV&checkIn=2026-06-01&checkOut=2026-06-03&adults=2&children=0&ratePlanCode=FLEX_RACK&lengthOfStay=2'
+method: GET
+headers:
+  - key: Accept
+    value: application/json
+queryParams:
+  - key: propertyId
+    value: GRAND-HOTEL-LV
+    description: Hotel property identifier.
+  - key: checkIn
+    value: '2026-06-01'
+    description: Check-in date in YYYY-MM-DD format.
+  - key: checkOut
+    value: '2026-06-03'
+    description: Check-out date in YYYY-MM-DD format. Must be after checkIn.
+  - key: adults
+    value: '2'
+    description: Number of adult guests.
+  - key: children
+    value: '0'
+    description: Number of child guests.
+  - key: ratePlanCode
+    value: FLEX_RACK
+    description: Filter availability to a specific rate plan. Returns all applicable plans if omitted.
+  - key: lengthOfStay
+    value: '2'
+    description: Minimum length of stay filter in nights.
+scripts:
+  - type: afterResponse
+    code:
+      - // [Smoke] Auto-generated test assertions
+      - pm.test('Status code is successful (2xx)', function () {
+      - '    pm.response.to.be.success;'
+      - '});'
+      - pm.test('Response time is acceptable', function () {
+      - '    var threshold = parseInt(pm.environment.get(''RESPONSE_TIME_THRESHOLD'') || ''2000'', 10);'
+      - '    pm.expect(pm.response.responseTime).to.be.below(threshold);'
+      - '});'
+      - pm.test('Response body is not empty', function () {
+      - '    if (pm.response.code !== 204) {'
+      - '        var body = pm.response.text();'
+      - '        pm.expect(body.length).to.be.above(0);'
+      - '    }'
+      - '});'
+    language: text/javascript
+examples:
+  - response:
+      statusCode: 200
+      statusText: OK
+      body:
+        type: json
+        content: |-
+          {
+            "propertyId": "GRAND-HOTEL-LV",
+            "currency": "USD",
+            "days": [
+              {
+                "date": "2026-06-01",
+                "available": true,
+                "lowestRate": 189,
+                "rateSummary": {
+                  "baseRate": 189,
+                  "taxRate": 28.35,
+                  "totalRate": 217.35
+                },
+                "ratePlanCode": "FLEX_RACK"
+              },
+              {
+                "date": "2026-06-02",
+                "available": true,
+                "lowestRate": 249,
+                "rateSummary": {
+                  "baseRate": 249,
+                  "taxRate": 37.35,
+                  "totalRate": 286.35
+                },
+                "ratePlanCode": "FLEX_RACK"
+              }
+            ]
+          }
+      headers:
+        - key: Content-Type
+          value: application/json
+    name: Calendar availability returned successfully
+  - response:
+      statusCode: 400
+      statusText: Bad Request
+      body:
+        type: json
+        content: |-
+          {
+            "code": "INVALID_REQUEST",
+            "message": "checkOut must be after checkIn"
+          }
+      headers:
+        - key: Content-Type
+          value: application/json
+    name: Invalid request parameters
+  - response:
+      statusCode: 401
+      statusText: Unauthorized
+      body:
+        type: json
+        content: |-
+          {
+            "code": "UNAUTHORIZED",
+            "message": "Bearer token is missing or expired"
+          }
+      headers:
+        - key: Content-Type
+          value: application/json
+    name: Missing or invalid OAuth2 token
+  - response:
+      statusCode: 404
+      statusText: Not Found
+      body:
+        type: json
+        content: |-
+          {
+            "code": "NOT_FOUND",
+            "message": "No reservation found for the provided confirmation number"
+          }
+      headers:
+        - key: Content-Type
+          value: application/json
+    name: Resource not found

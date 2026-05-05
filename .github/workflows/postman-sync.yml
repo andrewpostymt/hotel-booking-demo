@@ -1,0 +1,34 @@
+name: Postman Repo Sync
+
+on:
+  workflow_dispatch:
+    inputs:
+      project-name:
+        description: 'Service name'
+        required: true
+        default: 'room-booking-core-services'
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: postman-cs/postman-repo-sync-action@v0
+        with:
+          project-name: ${{ github.event.inputs.project-name }}
+          workspace-id: 8efae25c-c592-46ce-89f7-7102faef61e8
+          baseline-collection-id: 54514825-f41dec5f-ea60-4aff-9024-0a1c8acb4faa
+          smoke-collection-id: 54514825-eb096a01-0553-400e-9470-38b6c4943482
+          contract-collection-id: 54514825-a1348b01-85f3-40dc-a027-09affc770e96
+          environments-json: '["dev","qa2","qa4","preprod","nonprod-dev","nonprod-qa","nonprod-stage","nonprod-preprod"]'
+          environment-uids-json: '{"dev":"54514825-9c5d6d2d-9de1-4669-9140-89b894a6929a","qa2":"54514825-8ad55274-4f94-4631-8232-31a176d623a0","qa4":"54514825-f408c436-7f9b-426d-a178-b542658255e1","preprod":"54514825-5cf52355-675b-4388-a812-ed13aaa84a4b","nonprod-dev":"54514825-01c35951-1bfc-459b-a891-66b33b007866","nonprod-qa":"54514825-924abd1a-e366-4b9f-8d6d-a69d933a5e83","nonprod-stage":"54514825-bcffb744-4946-485d-8b34-5ee835b89b3c","nonprod-preprod":"54514825-11cc72bf-04d2-4d0f-baba-5bbb41e6bc33"}'
+          generate-ci-workflow: false
+          repo-write-mode: commit-and-push
+          postman-api-key: ${{ secrets.POSTMAN_API_KEY }}
+          postman-access-token: ${{ secrets.POSTMAN_ACCESS_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,61 @@
+type: http
+name: Retrieve reservation
+url: '{{baseUrl}}/reservations/:confirmationNumber'
+method: GET
+headers:
+  - key: Accept
+    value: application/json
+pathVariables:
+  - key: confirmationNumber
+    value: HOTEL-2026-884421
+    description: Reservation confirmation number returned at booking time.
+examples:
+  - response:
+      statusCode: 200
+      statusText: OK
+      body:
+        type: json
+        content: |-
+          {
+            "confirmationNumber": "string",
+            "status": "CANCELLED",
+            "propertyId": "string",
+            "roomTypeCode": "string",
+            "checkIn": "1957-08-18",
+            "checkOut": "1982-05-16",
+            "totalDue": 2260.6783337510983,
+            "createdAt": "1997-03-10T20:04:00.349Z",
+            "modifiedAt": "2001-02-22T09:39:31.271Z"
+          }
+      headers:
+        - key: Content-Type
+          value: application/json
+    name: Reservation retrieved successfully
+  - response:
+      statusCode: 401
+      statusText: Unauthorized
+      body:
+        type: json
+        content: |-
+          {
+            "code": "UNAUTHORIZED",
+            "message": "Bearer token is missing or expired"
+          }
+      headers:
+        - key: Content-Type
+          value: application/json
+    name: Missing or invalid OAuth2 token
+  - response:
+      statusCode: 404
+      statusText: Not Found
+      body:
+        type: json
+        content: |-
+          {
+            "code": "NOT_FOUND",
+            "message": "No reservation found for the provided confirmation number"
+          }
+      headers:
+        - key: Content-Type
+          value: application/json
+    name: Resource not found

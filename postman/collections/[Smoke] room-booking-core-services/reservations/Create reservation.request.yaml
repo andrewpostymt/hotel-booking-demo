@@ -1,0 +1,124 @@
+type: http
+name: Create reservation
+url: '{{baseUrl}}/reservations'
+method: POST
+headers:
+  - key: Content-Type
+    value: application/json
+  - key: Accept
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "propertyId": "GRAND-HOTEL-LV",
+      "roomTypeCode": "DELUXE-KING",
+      "ratePlanCode": "FLEX_RACK",
+      "checkIn": "2026-06-01",
+      "checkOut": "2026-06-03",
+      "guests": {
+        "adults": 2,
+        "children": 0,
+        "primary": {
+          "firstName": "Jane",
+          "lastName": "Smith",
+          "email": "jane.smith@example.com",
+          "phone": "+17025550100",
+          "mlifeNumber": "MLF-8823491"
+        }
+      },
+      "payment": {
+        "type": "CREDIT_CARD",
+        "token": "tok_visa_4242"
+      },
+      "addOns": [
+        {
+          "code": "RESORT-FEE"
+        }
+      ]
+    }
+scripts:
+  - type: afterResponse
+    code:
+      - // [Smoke] Auto-generated test assertions
+      - pm.test('Status code is successful (2xx)', function () {
+      - '    pm.response.to.be.success;'
+      - '});'
+      - pm.test('Response time is acceptable', function () {
+      - '    var threshold = parseInt(pm.environment.get(''RESPONSE_TIME_THRESHOLD'') || ''2000'', 10);'
+      - '    pm.expect(pm.response.responseTime).to.be.below(threshold);'
+      - '});'
+      - pm.test('Response body is not empty', function () {
+      - '    if (pm.response.code !== 204) {'
+      - '        var body = pm.response.text();'
+      - '        pm.expect(body.length).to.be.above(0);'
+      - '    }'
+      - '});'
+    language: text/javascript
+examples:
+  - response:
+      statusCode: 201
+      statusText: Created
+      body:
+        type: json
+        content: |-
+          {
+            "confirmationNumber": "HOTEL-2026-884421",
+            "status": "CONFIRMED",
+            "propertyId": "GRAND-HOTEL-LV",
+            "roomTypeCode": "DELUXE-KING",
+            "checkIn": "2026-06-01",
+            "checkOut": "2026-06-03",
+            "totalDue": 652.05,
+            "createdAt": "2026-04-29T14:22:00Z"
+          }
+      headers:
+        - key: Content-Type
+          value: application/json
+    name: Reservation created successfully
+  - response:
+      statusCode: 400
+      statusText: Bad Request
+      body:
+        type: json
+        content: |-
+          {
+            "code": "INVALID_REQUEST",
+            "message": "checkOut must be after checkIn"
+          }
+      headers:
+        - key: Content-Type
+          value: application/json
+    name: Invalid request parameters
+  - response:
+      statusCode: 401
+      statusText: Unauthorized
+      body:
+        type: json
+        content: |-
+          {
+            "code": "UNAUTHORIZED",
+            "message": "Bearer token is missing or expired"
+          }
+      headers:
+        - key: Content-Type
+          value: application/json
+    name: Missing or invalid OAuth2 token
+  - response:
+      statusCode: 409
+      statusText: Conflict
+      body:
+        type: json
+        content: |-
+          {
+            "code": "string",
+            "message": "string",
+            "details": [
+              "string",
+              "string"
+            ]
+          }
+      headers:
+        - key: Content-Type
+          value: application/json
+    name: Room no longer available — inventory changed between availability check and booking attempt

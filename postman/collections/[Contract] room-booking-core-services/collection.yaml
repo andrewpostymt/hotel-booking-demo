@@ -1,0 +1,33 @@
+$schema: https://schema.postman.com/json/draft-2020-12/collection/v3.0.0/
+type: collection
+name: '[Contract] room-booking-core-services'
+description: |-
+  Core services for the room booking flow across hotel properties.
+  Covers pricing, availability, reservations, and customer credit.
+
+
+  Contact Support:
+   Name: Room Booking Services Team
+   Email: api-team@example-hospitality.com
+id: a1348b01-85f3-40dc-a027-09affc770e96
+auth:
+  type: oauth2
+  credentials:
+    - key: scope
+      value: room-booking:read room-booking:write
+      type: string
+    - key: accessTokenUrl
+      value: /auth/token
+      type: string
+    - key: grant_type
+      value: client_credentials
+      type: string
+variables:
+  - key: baseUrl
+    value: https://dev-api.example-hospitality.com/room-booking/v3
+items:
+  - ref: ./health/folder.yaml
+  - ref: ./availability/folder.yaml
+  - ref: ./pricing/folder.yaml
+  - ref: ./reservations/folder.yaml
+  - ref: ./00 - Resolve Secrets.request.yaml

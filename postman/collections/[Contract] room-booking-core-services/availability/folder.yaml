@@ -1,0 +1,6 @@
+type: folder
+name: availability
+items:
+  - ref: ./calendar/folder.yaml
+  - ref: ./trip/folder.yaml
+  - ref: ./grid/folder.yaml

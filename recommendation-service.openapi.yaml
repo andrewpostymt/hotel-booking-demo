@@ -1,0 +1,762 @@
+openapi: 3.1.0
+info:
+  title: Recommendation Service
+  version: 1.0.0
+  description: |
+    Cross-sell and upsell recommendation engine for the room booking flow.
+    Returns personalized offers based on order context, stay parameters, and guest preferences.
+    Integrates with the room booking service to surface additional revenue opportunities
+    post-booking and at key funnel steps.
+  contact:
+    name: Room Booking Services Team
+    email: api-team@example-hospitality.com
+  x-api-owner: booking-services
+
+servers:
+  - url: https://recommendation-dev.example-hospitality.com
+    description: Development (Azure)
+  - url: https://dev-api.gateway.example-hospitality.com/recommendation
+    description: Dev (Apigee)
+  - url: https://qa2-api.gateway.example-hospitality.com/recommendation
+    description: QA2 (Apigee)
+  - url: https://qa4-api.gateway.example-hospitality.com/recommendation
+    description: QA4 (Apigee)
+  - url: https://preprod-api.gateway.example-hospitality.com/recommendation
+    description: Preprod (Apigee devtest)
+  - url: https://nonprod-dev.gateway.example-hospitality.com/recommendation
+    description: NonProd Dev
+  - url: https://nonprod-qa.gateway.example-hospitality.com/recommendation
+    description: NonProd QA
+  - url: https://nonprod-stage.gateway.example-hospitality.com/recommendation
+    description: NonProd Stage
+  - url: https://nonprod-preprod.gateway.example-hospitality.com/recommendation
+    description: NonProd Preprod
+
+security:
+  - OAuth2ClientCredentials: []
+
+tags:
+  - name: Auth
+    description: OAuth2 token operations
+  - name: Health
+    description: Service health and readiness
+  - name: Recommendations
+    description: Recommendation retrieval and configuration
+  - name: Events
+    description: Event-linked stay preference submissions
+
+paths:
+  /auth/token:
+    post:
+      operationId: getAuthToken
+      summary: Obtain OAuth2 access token
+      description: |
+        Issues an OAuth2 client credentials access token for authenticating
+        subsequent recommendation service requests. Token lifetime is 3600 seconds.
+      tags:
+        - Auth
+      x-api-owner: platform-team
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenRequest'
+            examples:
+              clientCredentials:
+                summary: Client credentials grant
+                value:
+                  grant_type: client_credentials
+                  client_id: recommendation-svc-client
+                  client_secret: "**redacted**"
+      responses:
+        '200':
+          description: Access token issued successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+              examples:
+                success:
+                  summary: Token response
+                  value:
+                    access_token: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJyZWNvbW1lbmRhdGlvbi1zdmMtY2xpZW50IiwiaWF0IjoxNzE0NjAwMDAwfQ.signature
+                    token_type: Bearer
+                    expires_in: 3600
+        '401':
+          description: Invalid client credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /health:
+    get:
+      operationId: getHealth
+      summary: Service health check
+      description: |
+        Returns the operational status of the recommendation service and its
+        downstream dependencies. Used by load balancers and monitoring probes.
+      tags:
+        - Health
+      x-api-owner: booking-services
+      security: []
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+              examples:
+                healthy:
+                  summary: All systems nominal
+                  value:
+                    status: healthy
+                    version: "1.4.2"
+                    dependencies:
+                      recommendation_engine: healthy
+                      inventory_cache: healthy
+                      pricing_feed: healthy
+                    timestamp: "2026-04-29T14:00:00Z"
+        '503':
+          description: Service degraded or unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+  /recommendations:
+    get:
+      operationId: getRecommendations
+      summary: Get personalized recommendations for an order
+      description: |
+        Returns a ranked list of cross-sell and upsell offers for a given order context.
+        Recommendations are personalized based on the guest's order history, stay parameters,
+        and property-level availability. Set `showsOnly=true` to filter to entertainment
+        offers exclusively (used in the post-booking shows upsell flow).
+
+        The `stayNights` parameter drives offer selection logic:
+        - `stayNights=1`: single-night offers, show add-ons, dining
+        - `stayNights=3`: multi-night packages, resort credits, extended stay incentives
+      tags:
+        - Recommendations
+      x-api-owner: booking-services
+      parameters:
+        - name: orderId
+          in: query
+          required: true
+          description: Unique identifier of the confirmed booking order
+          schema:
+            type: string
+            example: "ORD-2026-00124857"
+        - name: roomCount
+          in: query
+          required: false
+          description: Number of rooms in the order — influences bundle sizing for recommendations
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 10
+            default: 1
+            example: 1
+        - name: stayNights
+          in: query
+          required: false
+          description: Length of stay in nights — drives offer selection logic
+          schema:
+            type: integer
+            enum: [1, 3]
+            default: 1
+            example: 3
+        - name: showsOnly
+          in: query
+          required: false
+          description: |
+            When true, filters recommendations to entertainment and show offers only.
+            Used in the post-booking upsell flow for guests who have not added show tickets.
+          schema:
+            type: boolean
+            default: false
+            example: false
+        - name: propertyCode
+          in: query
+          required: false
+          description: Hotel property code to scope recommendations to a specific property
+          schema:
+            type: string
+            example: "ARIA"
+      responses:
+        '200':
+          description: Recommendations returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecommendationResponse'
+              examples:
+                multiNightWithShows:
+                  summary: 3-night stay — mixed offers including shows
+                  value:
+                    orderId: "ORD-2026-00124857"
+                    propertyCode: "ARIA"
+                    recommendations:
+                      - offerId: "OFR-SHOW-BM-001"
+                        offerType: entertainment
+                        title: "Bruno Mars at Dolby Live"
+                        description: "Add show tickets to your stay — limited availability for your dates."
+                        price: 199.00
+                        currency: USD
+                        rank: 1
+                        availableQuantity: 4
+                        expiresAt: "2026-05-10T23:59:59Z"
+                      - offerId: "OFR-DINING-001"
+                        offerType: dining
+                        title: "Nobu Restaurant — Priority Reservation"
+                        description: "Reserve your table at Nobu with guaranteed seating during your stay."
+                        price: 0.00
+                        currency: USD
+                        rank: 2
+                        availableQuantity: 2
+                        expiresAt: "2026-05-10T23:59:59Z"
+                      - offerId: "OFR-PKG-SPA-001"
+                        offerType: resort_package
+                        title: "Spa + Late Checkout Package"
+                        description: "Extend your relaxation with a 60-min treatment and 2pm checkout."
+                        price: 149.00
+                        currency: USD
+                        rank: 3
+                        availableQuantity: 8
+                        expiresAt: "2026-05-10T23:59:59Z"
+                    generatedAt: "2026-04-29T14:00:00Z"
+                    totalCount: 3
+                showsOnlyFilter:
+                  summary: Shows-only filter applied
+                  value:
+                    orderId: "ORD-2026-00198432"
+                    propertyCode: "GRAND_HOTEL"
+                    recommendations:
+                      - offerId: "OFR-SHOW-UF-001"
+                        offerType: entertainment
+                        title: "Upscale Funk — Live at Garden Arena"
+                        description: "Don't miss the hottest show on the Strip. 2 seats remaining for your dates."
+                        price: 89.00
+                        currency: USD
+                        rank: 1
+                        availableQuantity: 2
+                        expiresAt: "2026-05-12T23:59:59Z"
+                    generatedAt: "2026-04-29T14:15:00Z"
+                    totalCount: 1
+        '400':
+          description: Missing or invalid query parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                missingOrderId:
+                  summary: orderId is required
+                  value:
+                    code: VALIDATION_ERROR
+                    message: "orderId is required"
+                    detail: "Query parameter 'orderId' must be provided"
+        '401':
+          description: Unauthorized — missing or expired token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Order not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /recommendations/event-stays:
+    post:
+      operationId: submitEventStayPreferences
+      # NOTE: description intentionally omitted — Spectral gap #1 (operation-description-required will flag this)
+      summary: Submit event-linked room stay preferences
+      tags:
+        - Events
+      x-api-owner: booking-services
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventStayRequest'
+            examples:
+              brunoMarsStay:
+                summary: Bruno Mars show — room stay preference submission
+                value:
+                  eventId: "EVT-BM-DOLBY-2026"
+                  eventName: "Bruno Mars at Dolby Live"
+                  propertyCode: "ARIA"
+                  preferredCheckIn: "2026-05-15"
+                  preferredCheckOut: "2026-05-17"
+                  roomCount: 1
+                  guestCount: 2
+                  orderId: null
+              upscaleFunkStay:
+                summary: Upscale Funk show — room stay preference submission
+                value:
+                  eventId: "EVT-UF-GARDEN-2026"
+                  eventName: "Upscale Funk at Garden Arena"
+                  propertyCode: "GRAND_HOTEL"
+                  preferredCheckIn: "2026-05-20"
+                  preferredCheckOut: "2026-05-21"
+                  roomCount: 1
+                  guestCount: 2
+                  orderId: null
+      responses:
+        '201':
+          description: Event stay preferences recorded and recommendation shortlist generated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventStayResponse'
+              examples:
+                created:
+                  summary: Preferences accepted
+                  value:
+                    preferenceId: "PREF-2026-00087432"
+                    eventId: "EVT-BM-DOLBY-2026"
+                    status: queued
+                    estimatedOfferCount: 4
+                    redirectUrl: "https://www.example-hospitality.com/booking/room?prefId=PREF-2026-00087432"
+        '400':
+          description: Invalid request payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /recommendations/configuration:
+    get:
+      operationId: getRecommendationConfiguration
+      summary: Retrieve active recommendation engine configuration
+      description: |
+        Returns the current configuration state of the recommendation engine,
+        including active offer weightings, blackout dates, and property-level
+        override flags. Used by the platform team for live configuration inspection.
+      tags:
+        - Recommendations
+      x-api-owner: platform-team
+      responses:
+        '200':
+          description: Current configuration snapshot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfigurationResponse'
+              # NOTE: examples intentionally omitted — Spectral gap #2 (response-examples-required will flag this)
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      operationId: updateRecommendationConfiguration
+      summary: Update recommendation engine configuration
+      description: |
+        Applies configuration overrides to the live recommendation engine.
+        Changes take effect within 60 seconds across all instances. Use to adjust
+        offer weightings, toggle property-level features, or set blackout windows
+        without a deployment.
+      tags:
+        - Recommendations
+      x-api-owner: platform-team
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConfigurationUpdateRequest'
+            examples:
+              boostShows:
+                summary: Boost entertainment offer ranking
+                value:
+                  offerWeights:
+                    entertainment: 0.8
+                    dining: 0.5
+                    resort_package: 0.6
+                  blackoutDates: []
+                  propertyOverrides:
+                    ARIA:
+                      showsOnlyEnabled: true
+      responses:
+        '200':
+          description: Configuration updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfigurationResponse'
+              examples:
+                updated:
+                  summary: Updated configuration
+                  value:
+                    configVersion: "2026.04.29.001"
+                    lastUpdatedBy: "platform-team"
+                    lastUpdatedAt: "2026-04-29T14:00:00Z"
+                    offerWeights:
+                      entertainment: 0.8
+                      dining: 0.5
+                      resort_package: 0.6
+                    blackoutDates: []
+                    propertyOverrides:
+                      ARIA:
+                        showsOnlyEnabled: true
+        '400':
+          description: Invalid configuration payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    OAuth2ClientCredentials:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: /auth/token
+          scopes:
+            recommendations:read: Read recommendations for a given order
+            recommendations:write: Submit event stay preferences
+            configuration:read: Read engine configuration (platform team)
+            configuration:write: Update engine configuration (platform team)
+
+  schemas:
+    TokenRequest:
+      type: object
+      required:
+        - grant_type
+        - client_id
+        - client_secret
+      properties:
+        grant_type:
+          type: string
+          enum: [client_credentials]
+          description: OAuth2 grant type — must be client_credentials
+        client_id:
+          type: string
+          description: Registered client application identifier
+        client_secret:
+          type: string
+          description: Client application secret
+          format: password
+
+    TokenResponse:
+      type: object
+      required:
+        - access_token
+        - token_type
+        - expires_in
+      properties:
+        access_token:
+          type: string
+          description: JWT bearer token for authenticating API requests
+        token_type:
+          type: string
+          enum: [Bearer]
+        expires_in:
+          type: integer
+          description: Token lifetime in seconds
+          example: 3600
+
+    HealthResponse:
+      type: object
+      required:
+        - status
+        - timestamp
+      properties:
+        status:
+          type: string
+          enum: [healthy, degraded, unhealthy]
+          description: Overall service health status
+        version:
+          type: string
+          description: Deployed service version
+          example: "1.4.2"
+        dependencies:
+          type: object
+          description: Health status of downstream dependencies
+          additionalProperties:
+            type: string
+            enum: [healthy, degraded, unhealthy]
+        timestamp:
+          type: string
+          format: date-time
+          description: UTC timestamp of the health check response
+
+    RecommendationItem:
+      type: object
+      required:
+        - offerId
+        - offerType
+        - title
+        - price
+        - currency
+        - rank
+      properties:
+        offerId:
+          type: string
+          description: Unique offer identifier
+          example: "OFR-SHOW-BM-001"
+        offerType:
+          type: string
+          enum: [entertainment, dining, resort_package, room_upgrade, transportation]
+          description: Category of the recommendation offer
+        title:
+          type: string
+          description: Human-readable offer title displayed in the booking UI
+          example: "Bruno Mars at Dolby Live"
+        description:
+          type: string
+          description: Brief marketing description of the offer
+        price:
+          type: number
+          format: float
+          description: Offer price; 0.00 for complimentary offers
+          example: 199.00
+        currency:
+          type: string
+          description: ISO 4217 currency code
+          example: USD
+        rank:
+          type: integer
+          description: Engine-assigned rank (1 = highest priority)
+          minimum: 1
+          example: 1
+        availableQuantity:
+          type: integer
+          description: Remaining inventory for this offer
+          example: 4
+        expiresAt:
+          type: string
+          format: date-time
+          description: Offer expiry timestamp — after this the offer is no longer bookable
+
+    RecommendationResponse:
+      type: object
+      required:
+        - orderId
+        - recommendations
+        - generatedAt
+        - totalCount
+      properties:
+        orderId:
+          type: string
+          description: Order ID this recommendation set is associated with
+        propertyCode:
+          type: string
+          description: Hotel property code for scoped recommendations
+          example: "ARIA"
+        recommendations:
+          type: array
+          items:
+            $ref: '#/components/schemas/RecommendationItem'
+          description: Ranked list of personalized offers
+        generatedAt:
+          type: string
+          format: date-time
+          description: UTC timestamp when the recommendation set was generated
+        totalCount:
+          type: integer
+          description: Total number of recommendations returned
+
+    EventStayRequest:
+      type: object
+      required:
+        - eventId
+        - eventName
+        - propertyCode
+        - preferredCheckIn
+        - preferredCheckOut
+        - roomCount
+        - guestCount
+      properties:
+        eventId:
+          type: string
+          description: Internal event identifier
+          example: "EVT-BM-DOLBY-2026"
+        eventName:
+          type: string
+          description: Display name of the event
+          example: "Bruno Mars at Dolby Live"
+        propertyCode:
+          type: string
+          description: Hotel property where the event is held
+          example: "ARIA"
+        preferredCheckIn:
+          type: string
+          format: date
+          description: Preferred check-in date (YYYY-MM-DD)
+          example: "2026-05-15"
+        preferredCheckOut:
+          type: string
+          format: date
+          description: Preferred check-out date (YYYY-MM-DD)
+          example: "2026-05-17"
+        roomCount:
+          type: integer
+          minimum: 1
+          maximum: 10
+          description: Number of rooms needed
+          example: 1
+        guestCount:
+          type: integer
+          minimum: 1
+          description: Total number of guests
+          example: 2
+        orderId:
+          type: string
+          nullable: true
+          description: Existing order ID if the guest already has a booking; null for new searches
+          example: null
+
+    EventStayResponse:
+      type: object
+      required:
+        - preferenceId
+        - eventId
+        - status
+      properties:
+        preferenceId:
+          type: string
+          description: Unique identifier for the submitted preference record
+          example: "PREF-2026-00087432"
+        eventId:
+          type: string
+          description: Event this preference is associated with
+          example: "EVT-BM-DOLBY-2026"
+        status:
+          type: string
+          enum: [queued, processing, completed, expired]
+          description: Current processing status of the preference submission
+        estimatedOfferCount:
+          type: integer
+          description: Estimated number of room offers that will be surfaced
+          example: 4
+        redirectUrl:
+          type: string
+          format: uri
+          description: Deep link to the booking flow pre-populated with these preferences
+
+    ConfigurationResponse:
+      type: object
+      required:
+        - configVersion
+        - lastUpdatedAt
+        - offerWeights
+      properties:
+        configVersion:
+          type: string
+          description: Versioned configuration snapshot identifier
+          example: "2026.04.29.001"
+        lastUpdatedBy:
+          type: string
+          description: Identity that last modified the configuration
+        lastUpdatedAt:
+          type: string
+          format: date-time
+        offerWeights:
+          type: object
+          description: Relative scoring weights for offer categories (0.0–1.0)
+          properties:
+            entertainment:
+              type: number
+              format: float
+              minimum: 0
+              maximum: 1
+            dining:
+              type: number
+              format: float
+              minimum: 0
+              maximum: 1
+            resort_package:
+              type: number
+              format: float
+              minimum: 0
+              maximum: 1
+        blackoutDates:
+          type: array
+          items:
+            type: string
+            format: date
+          description: Dates on which recommendation engine output is suppressed
+        propertyOverrides:
+          type: object
+          description: Per-property configuration overrides keyed by property code
+          additionalProperties:
+            type: object
+            properties:
+              showsOnlyEnabled:
+                type: boolean
+
+    ConfigurationUpdateRequest:
+      type: object
+      properties:
+        offerWeights:
+          type: object
+          properties:
+            entertainment:
+              type: number
+              format: float
+              minimum: 0
+              maximum: 1
+            dining:
+              type: number
+              format: float
+              minimum: 0
+              maximum: 1
+            resort_package:
+              type: number
+              format: float
+              minimum: 0
+              maximum: 1
+        blackoutDates:
+          type: array
+          items:
+            type: string
+            format: date
+        propertyOverrides:
+          type: object
+          additionalProperties:
+            type: object
+            properties:
+              showsOnlyEnabled:
+                type: boolean
+
+    ErrorResponse:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+          example: VALIDATION_ERROR
+        message:
+          type: string
+          description: Human-readable error summary
+          example: "orderId is required"
+        detail:
+          type: string
+          description: Extended error detail for debugging
+          example: "Query parameter 'orderId' must be provided"
+        traceId:
+          type: string
+          description: Distributed trace ID for log correlation
+          example: "trace-00124857-abc"

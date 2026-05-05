@@ -1,0 +1,110 @@
+type: http
+name: Get trip availability
+url: '{{baseUrl}}/availability/trip?propertyId=GRAND-HOTEL-LV&checkIn=2026-06-01&checkOut=2026-06-03&adults=2&children=0&roomTypeCode=DELUXE-KING'
+method: GET
+headers:
+  - key: Accept
+    value: application/json
+queryParams:
+  - key: propertyId
+    value: GRAND-HOTEL-LV
+    description: Hotel property identifier.
+  - key: checkIn
+    value: '2026-06-01'
+    description: Check-in date in YYYY-MM-DD format.
+  - key: checkOut
+    value: '2026-06-03'
+    description: Check-out date in YYYY-MM-DD format. Must be after checkIn.
+  - key: adults
+    value: '2'
+    description: Number of adult guests.
+  - key: children
+    value: '0'
+    description: Number of child guests.
+  - key: roomTypeCode
+    value: DELUXE-KING
+    description: Filter to a specific room type code.
+examples:
+  - response:
+      statusCode: 200
+      statusText: OK
+      body:
+        type: json
+        content: |-
+          {
+            "propertyId": "GRAND-HOTEL-LV",
+            "checkIn": "2026-06-01",
+            "checkOut": "2026-06-03",
+            "guests": {
+              "adults": 2,
+              "children": 0
+            },
+            "rooms": [
+              {
+                "roomTypeCode": "DELUXE-KING",
+                "roomTypeName": "Deluxe King Room",
+                "available": true,
+                "nightlyRate": 219,
+                "totalBeforeTax": 438,
+                "taxAmount": 65.7,
+                "totalWithTax": 503.7,
+                "ratePlanCode": "FLEX_RACK"
+              },
+              {
+                "roomTypeCode": "STRIP-VIEW-SUITE",
+                "roomTypeName": "Strip View Suite",
+                "available": true,
+                "nightlyRate": 389,
+                "totalBeforeTax": 778,
+                "taxAmount": 116.7,
+                "totalWithTax": 894.7,
+                "ratePlanCode": "FLEX_RACK"
+              }
+            ]
+          }
+      headers:
+        - key: Content-Type
+          value: application/json
+    name: Trip availability returned successfully
+  - response:
+      statusCode: 400
+      statusText: Bad Request
+      body:
+        type: json
+        content: |-
+          {
+            "code": "INVALID_REQUEST",
+            "message": "checkOut must be after checkIn"
+          }
+      headers:
+        - key: Content-Type
+          value: application/json
+    name: Invalid request parameters
+  - response:
+      statusCode: 401
+      statusText: Unauthorized
+      body:
+        type: json
+        content: |-
+          {
+            "code": "UNAUTHORIZED",
+            "message": "Bearer token is missing or expired"
+          }
+      headers:
+        - key: Content-Type
+          value: application/json
+    name: Missing or invalid OAuth2 token
+  - response:
+      statusCode: 404
+      statusText: Not Found
+      body:
+        type: json
+        content: |-
+          {
+            "code": "NOT_FOUND",
+            "message": "No reservation found for the provided confirmation number"
+          }
+      headers:
+        - key: Content-Type
+          value: application/json
+    name: Resource not found

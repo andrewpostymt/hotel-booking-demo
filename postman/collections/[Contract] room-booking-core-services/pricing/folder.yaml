@@ -1,0 +1,6 @@
+type: folder
+name: pricing
+items:
+  - ref: ./customer-credit/folder.yaml
+  - ref: ./rate-plans/folder.yaml
+  - ref: ./room-charges/folder.yaml

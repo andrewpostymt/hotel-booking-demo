@@ -1,0 +1,61 @@
+type: http
+name: Cancel reservation
+url: '{{baseUrl}}/reservations/:confirmationNumber?reason=OTHER'
+method: DELETE
+headers:
+  - key: Accept
+    value: application/json
+queryParams:
+  - key: reason
+    value: OTHER
+    description: Cancellation reason code for reporting.
+pathVariables:
+  - key: confirmationNumber
+    value: HOTEL-2026-884421
+    description: Reservation confirmation number returned at booking time.
+examples:
+  - response:
+      statusCode: 200
+      statusText: OK
+      body:
+        type: json
+        content: |-
+          {
+            "confirmationNumber": "HOTEL-2026-884421",
+            "status": "CANCELLED",
+            "refundEligible": true,
+            "refundAmount": 652.05,
+            "cancelledAt": "2026-04-29T15:00:00Z"
+          }
+      headers:
+        - key: Content-Type
+          value: application/json
+    name: Reservation cancelled
+  - response:
+      statusCode: 401
+      statusText: Unauthorized
+      body:
+        type: json
+        content: |-
+          {
+            "code": "UNAUTHORIZED",
+            "message": "Bearer token is missing or expired"
+          }
+      headers:
+        - key: Content-Type
+          value: application/json
+    name: Missing or invalid OAuth2 token
+  - response:
+      statusCode: 404
+      statusText: Not Found
+      body:
+        type: json
+        content: |-
+          {
+            "code": "NOT_FOUND",
+            "message": "No reservation found for the provided confirmation number"
+          }
+      headers:
+        - key: Content-Type
+          value: application/json
+    name: Resource not found

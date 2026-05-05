@@ -1,0 +1,4 @@
+type: folder
+name: rate-plans
+items:
+  - ref: ./Search rate plans.request.yaml

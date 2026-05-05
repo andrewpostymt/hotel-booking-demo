@@ -1,0 +1,7 @@
+# Postman bootstrap/sync output — contain workspace/collection IDs for our sandbox account
+bootstrap-rbs.env
+bootstrap-rbs-result.json
+postman-repo-sync-result.json
+
+# CI test result artifacts
+results/

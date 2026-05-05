@@ -1,0 +1,96 @@
+type: http
+name: Get customer credit calendar
+url: '{{baseUrl}}/pricing/customer-credit?propertyId=GRAND-HOTEL-LV&checkIn=2026-06-01&checkOut=2026-06-03&mlifeNumber=MLF-8823491&ratePlanCode=MLIFE-MEMBER'
+method: GET
+headers:
+  - key: Accept
+    value: application/json
+queryParams:
+  - key: propertyId
+    value: GRAND-HOTEL-LV
+    description: Hotel property identifier.
+  - key: checkIn
+    value: '2026-06-01'
+    description: Check-in date in YYYY-MM-DD format.
+  - key: checkOut
+    value: '2026-06-03'
+    description: Check-out date in YYYY-MM-DD format. Must be after checkIn.
+  - key: mlifeNumber
+    value: MLF-8823491
+    description: Guest M life Rewards membership number.
+  - key: ratePlanCode
+    value: MLIFE-MEMBER
+    description: Rate plan to evaluate credit eligibility against.
+examples:
+  - response:
+      statusCode: 200
+      statusText: OK
+      body:
+        type: json
+        content: |-
+          {
+            "mlifeNumber": "MLF-8823491",
+            "propertyId": "GRAND-HOTEL-LV",
+            "creditEligible": true,
+            "tierStatus": "GOLD",
+            "days": [
+              {
+                "date": "2026-06-01",
+                "baseCredits": 500,
+                "bonusCredits": 250,
+                "totalCredits": 750
+              },
+              {
+                "date": "2026-06-02",
+                "baseCredits": 500,
+                "bonusCredits": 250,
+                "totalCredits": 750
+              }
+            ]
+          }
+      headers:
+        - key: Content-Type
+          value: application/json
+    name: Customer credit calendar returned successfully
+  - response:
+      statusCode: 400
+      statusText: Bad Request
+      body:
+        type: json
+        content: |-
+          {
+            "code": "INVALID_REQUEST",
+            "message": "checkOut must be after checkIn"
+          }
+      headers:
+        - key: Content-Type
+          value: application/json
+    name: Invalid request parameters
+  - response:
+      statusCode: 401
+      statusText: Unauthorized
+      body:
+        type: json
+        content: |-
+          {
+            "code": "UNAUTHORIZED",
+            "message": "Bearer token is missing or expired"
+          }
+      headers:
+        - key: Content-Type
+          value: application/json
+    name: Missing or invalid OAuth2 token
+  - response:
+      statusCode: 404
+      statusText: Not Found
+      body:
+        type: json
+        content: |-
+          {
+            "code": "NOT_FOUND",
+            "message": "No reservation found for the provided confirmation number"
+          }
+      headers:
+        - key: Content-Type
+          value: application/json
+    name: Resource not found

@@ -1,0 +1,98 @@
+type: http
+name: Search rate plans
+url: '{{baseUrl}}/pricing/rate-plans?propertyId=GRAND-HOTEL-LV&checkIn=2026-06-01&checkOut=2026-06-03&segment=GROUP'
+method: GET
+headers:
+  - key: Accept
+    value: application/json
+queryParams:
+  - key: propertyId
+    value: GRAND-HOTEL-LV
+    description: Hotel property identifier.
+  - key: checkIn
+    value: '2026-06-01'
+    description: Check-in date in YYYY-MM-DD format.
+  - key: checkOut
+    value: '2026-06-03'
+    description: Check-out date in YYYY-MM-DD format. Must be after checkIn.
+  - key: segment
+    value: GROUP
+    description: Guest segment filter (e.g. LEISURE, CORPORATE, GROUP).
+scripts:
+  - type: afterResponse
+    code:
+      - // [Smoke] Auto-generated test assertions
+      - pm.test('Status code is successful (2xx)', function () {
+      - '    pm.response.to.be.success;'
+      - '});'
+      - pm.test('Response time is acceptable', function () {
+      - '    var threshold = parseInt(pm.environment.get(''RESPONSE_TIME_THRESHOLD'') || ''2000'', 10);'
+      - '    pm.expect(pm.response.responseTime).to.be.below(threshold);'
+      - '});'
+      - pm.test('Response body is not empty', function () {
+      - '    if (pm.response.code !== 204) {'
+      - '        var body = pm.response.text();'
+      - '        pm.expect(body.length).to.be.above(0);'
+      - '    }'
+      - '});'
+    language: text/javascript
+examples:
+  - response:
+      statusCode: 200
+      statusText: OK
+      body:
+        type: json
+        content: |-
+          {
+            "propertyId": "GRAND-HOTEL-LV",
+            "ratePlans": [
+              {
+                "code": "FLEX_RACK",
+                "name": "Flexible Rack Rate",
+                "segment": "LEISURE",
+                "refundable": true,
+                "cancellationPolicy": "Cancel up to 48 hours before check-in for full refund",
+                "minNights": 1
+              },
+              {
+                "code": "ADVANCE-SAVER",
+                "name": "Advance Purchase Saver",
+                "segment": "LEISURE",
+                "refundable": false,
+                "cancellationPolicy": "Non-refundable",
+                "minNights": 2
+              }
+            ]
+          }
+      headers:
+        - key: Content-Type
+          value: application/json
+    name: Rate plans returned successfully
+  - response:
+      statusCode: 400
+      statusText: Bad Request
+      body:
+        type: json
+        content: |-
+          {
+            "code": "INVALID_REQUEST",
+            "message": "checkOut must be after checkIn"
+          }
+      headers:
+        - key: Content-Type
+          value: application/json
+    name: Invalid request parameters
+  - response:
+      statusCode: 401
+      statusText: Unauthorized
+      body:
+        type: json
+        content: |-
+          {
+            "code": "UNAUTHORIZED",
+            "message": "Bearer token is missing or expired"
+          }
+      headers:
+        - key: Content-Type
+          value: application/json
+    name: Missing or invalid OAuth2 token

@@ -1,0 +1,120 @@
+type: http
+name: Modify reservation
+url: '{{baseUrl}}/reservations/:confirmationNumber'
+method: PUT
+headers:
+  - key: Content-Type
+    value: application/json
+  - key: Accept
+    value: application/json
+pathVariables:
+  - key: confirmationNumber
+    value: HOTEL-2026-884421
+    description: Reservation confirmation number returned at booking time.
+body:
+  type: json
+  content: |-
+    {
+      "checkIn": "1955-10-05",
+      "checkOut": "1979-03-05",
+      "roomTypeCode": "string",
+      "guests": {
+        "adults": 27,
+        "children": 1314
+      },
+      "addOns": [
+        {
+          "code": "RESORT-FEE",
+          "description": "string",
+          "amount": 6087.839834649709
+        },
+        {
+          "code": "RESORT-FEE",
+          "description": "string",
+          "amount": 8460.84464512041
+        }
+      ],
+      "specialRequests": "string"
+    }
+examples:
+  - response:
+      statusCode: 200
+      statusText: OK
+      body:
+        type: json
+        content: |-
+          {
+            "confirmationNumber": "string",
+            "status": "CANCELLED",
+            "propertyId": "string",
+            "roomTypeCode": "string",
+            "checkIn": "1957-08-18",
+            "checkOut": "1982-05-16",
+            "totalDue": 2260.6783337510983,
+            "createdAt": "1997-03-10T20:04:00.349Z",
+            "modifiedAt": "2001-02-22T09:39:31.271Z"
+          }
+      headers:
+        - key: Content-Type
+          value: application/json
+    name: Reservation modified successfully
+  - response:
+      statusCode: 400
+      statusText: Bad Request
+      body:
+        type: json
+        content: |-
+          {
+            "code": "INVALID_REQUEST",
+            "message": "checkOut must be after checkIn"
+          }
+      headers:
+        - key: Content-Type
+          value: application/json
+    name: Invalid request parameters
+  - response:
+      statusCode: 401
+      statusText: Unauthorized
+      body:
+        type: json
+        content: |-
+          {
+            "code": "UNAUTHORIZED",
+            "message": "Bearer token is missing or expired"
+          }
+      headers:
+        - key: Content-Type
+          value: application/json
+    name: Missing or invalid OAuth2 token
+  - response:
+      statusCode: 404
+      statusText: Not Found
+      body:
+        type: json
+        content: |-
+          {
+            "code": "NOT_FOUND",
+            "message": "No reservation found for the provided confirmation number"
+          }
+      headers:
+        - key: Content-Type
+          value: application/json
+    name: Resource not found
+  - response:
+      statusCode: 409
+      statusText: Conflict
+      body:
+        type: json
+        content: |-
+          {
+            "code": "string",
+            "message": "string",
+            "details": [
+              "string",
+              "string"
+            ]
+          }
+      headers:
+        - key: Content-Type
+          value: application/json
+    name: Modification not permitted under current rate plan or reservation status

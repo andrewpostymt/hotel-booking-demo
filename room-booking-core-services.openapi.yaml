@@ -1,0 +1,1121 @@
+openapi: 3.1.0
+info:
+  title: Room Booking Core Services
+  description: |
+    Core services for the room booking flow across hotel properties.
+    Covers pricing, availability, reservations, and customer credit.
+  version: 3.0.0
+  x-api-owner: booking-services
+  contact:
+    name: Room Booking Services Team
+    email: api-team@example-hospitality.com
+
+servers:
+  - url: https://dev-api.example-hospitality.com/room-booking/v3
+    description: dev
+  - url: https://qa-api.example-hospitality.com/room-booking/v3
+    description: qa
+  - url: https://preprod-api.example-hospitality.com/room-booking/v3
+    description: preprod
+  - url: https://api.example-hospitality.com/room-booking/v3
+    description: production
+
+security:
+  - OAuth2ClientCredentials: []
+
+tags:
+  - name: Availability
+    description: Room pricing and availability across properties and date ranges
+  - name: Reservations
+    description: Create, retrieve, modify, and cancel room reservations
+  - name: Pricing
+    description: Rate plans, room charges, and customer credit
+  - name: Health
+    description: Service health and readiness
+
+paths:
+
+  /health:
+    get:
+      tags: [Health]
+      summary: Health check
+      description: Returns the health status of the Room Booking Core Services API. Used by CI/CD pipeline smoke tests and monitoring.
+      operationId: getHealth
+      x-api-owner: platform-sre
+      security: []
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+              examples:
+                healthy:
+                  summary: Healthy response
+                  value:
+                    status: UP
+                    version: "3.0.0"
+                    timestamp: "2026-04-29T14:00:00Z"
+
+  /availability/calendar:
+    get:
+      tags: [Availability]
+      summary: Get room availability calendar
+      description: |
+        Returns room pricing and availability for each day in a requested calendar period.
+        Results are keyed by date and include rate summary, occupancy status, and applicable
+        rate plan identifiers. Used to render the date-picker in the booking flow.
+      operationId: getAvailabilityCalendar
+      x-api-owner: booking-services
+      parameters:
+        - $ref: '#/components/parameters/PropertyId'
+        - $ref: '#/components/parameters/CheckIn'
+        - $ref: '#/components/parameters/CheckOut'
+        - $ref: '#/components/parameters/Adults'
+        - $ref: '#/components/parameters/Children'
+        - name: ratePlanCode
+          in: query
+          description: Filter availability to a specific rate plan. Returns all applicable plans if omitted.
+          schema:
+            type: string
+            example: FLEX_RACK
+        - name: lengthOfStay
+          in: query
+          description: Minimum length of stay filter in nights.
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 30
+            example: 2
+      responses:
+        '200':
+          description: Calendar availability returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalendarAvailabilityResponse'
+              examples:
+                standard:
+                  summary: Two-night calendar window
+                  value:
+                    propertyId: "GRAND-HOTEL-LV"
+                    currency: USD
+                    days:
+                      - date: "2026-06-01"
+                        available: true
+                        lowestRate: 189.00
+                        rateSummary:
+                          baseRate: 189.00
+                          taxRate: 28.35
+                          totalRate: 217.35
+                        ratePlanCode: FLEX_RACK
+                      - date: "2026-06-02"
+                        available: true
+                        lowestRate: 249.00
+                        rateSummary:
+                          baseRate: 249.00
+                          taxRate: 37.35
+                          totalRate: 286.35
+                        ratePlanCode: FLEX_RACK
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /availability/trip:
+    get:
+      tags: [Availability]
+      summary: Get trip availability
+      description: |
+        Returns room pricing and availability for a specific trip — a defined check-in date,
+        check-out date, and guest count at a given property. Returns available room types
+        with pricing breakdowns. Primary input to the room selection step in the booking flow.
+      operationId: getAvailabilityTrip
+      x-api-owner: booking-services
+      parameters:
+        - $ref: '#/components/parameters/PropertyId'
+        - $ref: '#/components/parameters/CheckIn'
+        - $ref: '#/components/parameters/CheckOut'
+        - $ref: '#/components/parameters/Adults'
+        - $ref: '#/components/parameters/Children'
+        - name: roomTypeCode
+          in: query
+          description: Filter to a specific room type code.
+          schema:
+            type: string
+            example: DELUXE-KING
+      responses:
+        '200':
+          description: Trip availability returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TripAvailabilityResponse'
+              examples:
+                standard:
+                  summary: Available rooms for a two-night trip
+                  value:
+                    propertyId: "GRAND-HOTEL-LV"
+                    checkIn: "2026-06-01"
+                    checkOut: "2026-06-03"
+                    guests:
+                      adults: 2
+                      children: 0
+                    rooms:
+                      - roomTypeCode: DELUXE-KING
+                        roomTypeName: Deluxe King Room
+                        available: true
+                        nightlyRate: 219.00
+                        totalBeforeTax: 438.00
+                        taxAmount: 65.70
+                        totalWithTax: 503.70
+                        ratePlanCode: FLEX_RACK
+                      - roomTypeCode: STRIP-VIEW-SUITE
+                        roomTypeName: Strip View Suite
+                        available: true
+                        nightlyRate: 389.00
+                        totalBeforeTax: 778.00
+                        taxAmount: 116.70
+                        totalWithTax: 894.70
+                        ratePlanCode: FLEX_RACK
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /availability/grid:
+    get:
+      tags: [Availability]
+      summary: Get availability grid
+      description: |
+        Returns a matrix of room availability across multiple properties and date combinations
+        simultaneously. Used to power the multi-property comparison view and flexible date
+        search. Response is structured as a grid keyed by property and date.
+      operationId: getAvailabilityGrid
+      x-api-owner: booking-services
+      parameters:
+        - $ref: '#/components/parameters/CheckIn'
+        - $ref: '#/components/parameters/CheckOut'
+        - $ref: '#/components/parameters/Adults'
+        - name: propertyIds
+          in: query
+          required: true
+          description: Comma-separated list of property IDs to include in the grid.
+          schema:
+            type: array
+            items:
+              type: string
+            example: ["GRAND-HOTEL-LV", "PALACE-HOTEL-LV", "SUMMIT-HOTEL-LV"]
+          style: form
+          explode: false
+      responses:
+        '200':
+          description: Availability grid returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AvailabilityGridResponse'
+              examples:
+                multi-property:
+                  summary: Grid for three properties
+                  value:
+                    checkIn: "2026-06-01"
+                    checkOut: "2026-06-03"
+                    grid:
+                      - propertyId: GRAND-HOTEL-LV
+                        propertyName: Grand Hotel Las Vegas
+                        lowestNightlyRate: 189.00
+                        available: true
+                      - propertyId: PALACE-HOTEL-LV
+                        propertyName: Bellagio
+                        lowestNightlyRate: 329.00
+                        available: true
+                      - propertyId: SUMMIT-HOTEL-LV
+                        propertyName: ARIA Resort & Casino
+                        lowestNightlyRate: 259.00
+                        available: false
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /pricing/customer-credit:
+    get:
+      tags: [Pricing]
+      summary: Get customer credit calendar
+      description: |
+        Returns M life Rewards credit eligibility and accrual rates for a specific guest
+        across a property and date range. Used to display loyalty credit information
+        during the booking flow before the guest commits to a reservation.
+      operationId: getCustomerCreditCalendar
+      x-api-owner: loyalty-integration-team
+      parameters:
+        - $ref: '#/components/parameters/PropertyId'
+        - $ref: '#/components/parameters/CheckIn'
+        - $ref: '#/components/parameters/CheckOut'
+        - name: mlifeNumber
+          in: query
+          required: true
+          description: Guest M life Rewards membership number.
+          schema:
+            type: string
+            example: "MLF-8823491"
+        - name: ratePlanCode
+          in: query
+          description: Rate plan to evaluate credit eligibility against.
+          schema:
+            type: string
+            example: MLIFE-MEMBER
+      responses:
+        '200':
+          description: Customer credit calendar returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerCreditCalendarResponse'
+              examples:
+                eligible:
+                  summary: Credit-eligible stay
+                  value:
+                    mlifeNumber: "MLF-8823491"
+                    propertyId: "GRAND-HOTEL-LV"
+                    creditEligible: true
+                    tierStatus: GOLD
+                    days:
+                      - date: "2026-06-01"
+                        baseCredits: 500
+                        bonusCredits: 250
+                        totalCredits: 750
+                      - date: "2026-06-02"
+                        baseCredits: 500
+                        bonusCredits: 250
+                        totalCredits: 750
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /pricing/rate-plans:
+    get:
+      tags: [Pricing]
+      summary: Search rate plans
+      description: |
+        Returns available rate plans for a property and date range, including eligibility
+        requirements, restrictions, and cancellation policies. Used to populate the rate
+        plan selector during booking and for governance validation of rate plan codes
+        passed to availability endpoints.
+      operationId: searchRatePlans
+      x-api-owner: booking-services
+      parameters:
+        - $ref: '#/components/parameters/PropertyId'
+        - $ref: '#/components/parameters/CheckIn'
+        - $ref: '#/components/parameters/CheckOut'
+        - name: segment
+          in: query
+          description: Guest segment filter (e.g. LEISURE, CORPORATE, GROUP).
+          schema:
+            type: string
+            enum: [LEISURE, CORPORATE, GROUP, MLIFE]
+      responses:
+        '200':
+          description: Rate plans returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RatePlanSearchResponse'
+              examples:
+                leisure-plans:
+                  summary: Leisure rate plans
+                  value:
+                    propertyId: GRAND-HOTEL-LV
+                    ratePlans:
+                      - code: FLEX_RACK
+                        name: Flexible Rack Rate
+                        segment: LEISURE
+                        refundable: true
+                        cancellationPolicy: Cancel up to 48 hours before check-in for full refund
+                        minNights: 1
+                      - code: ADVANCE-SAVER
+                        name: Advance Purchase Saver
+                        segment: LEISURE
+                        refundable: false
+                        cancellationPolicy: Non-refundable
+                        minNights: 2
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /pricing/room-charges:
+    post:
+      tags: [Pricing]
+      summary: Calculate room charges
+      description: |
+        Calculates the full room charge breakdown for a proposed booking including base rate,
+        resort fee, applicable taxes, and add-on pricing. Called before payment to present
+        the guest with the final itemized total. Required when the requested rate plan
+        includes conditional add-ons.
+      operationId: calculateRoomCharges
+      x-api-owner: booking-services
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CalculateRoomChargesRequest'
+            examples:
+              standard-booking:
+                summary: Standard two-night booking
+                value:
+                  propertyId: GRAND-HOTEL-LV
+                  roomTypeCode: DELUXE-KING
+                  ratePlanCode: FLEX_RACK
+                  checkIn: "2026-06-01"
+                  checkOut: "2026-06-03"
+                  guests:
+                    adults: 2
+                    children: 0
+                  addOns:
+                    - code: RESORT-FEE
+                    - code: EARLY-CHECKIN
+      responses:
+        '200':
+          description: Room charges calculated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoomChargesResponse'
+              examples:
+                standard:
+                  summary: Itemized charge breakdown
+                  value:
+                    propertyId: GRAND-HOTEL-LV
+                    roomTypeCode: DELUXE-KING
+                    nights: 2
+                    lineItems:
+                      - description: Deluxe King Room - Night 1
+                        amount: 219.00
+                      - description: Deluxe King Room - Night 2
+                        amount: 219.00
+                      - description: Resort Fee (2 nights)
+                        amount: 79.00
+                      - description: Early Check-In
+                        amount: 50.00
+                    subtotal: 567.00
+                    taxAmount: 85.05
+                    totalDue: 652.05
+                    currency: USD
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+
+  /reservations:
+    post:
+      tags: [Reservations]
+      summary: Create reservation
+      description: |
+        Creates a new room reservation. Accepts a fully validated booking payload including
+        guest profile, room selection, rate plan, and payment method. Returns a confirmation
+        number and full reservation record on success. This endpoint decrements live
+        inventory — use the mock server for all non-production test runs.
+      operationId: createReservation
+      x-api-owner: booking-services
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateReservationRequest'
+            examples:
+              standard:
+                summary: Standard reservation
+                value:
+                  propertyId: GRAND-HOTEL-LV
+                  roomTypeCode: DELUXE-KING
+                  ratePlanCode: FLEX_RACK
+                  checkIn: "2026-06-01"
+                  checkOut: "2026-06-03"
+                  guests:
+                    adults: 2
+                    children: 0
+                    primary:
+                      firstName: Jane
+                      lastName: Smith
+                      email: jane.smith@example.com
+                      phone: "+17025550100"
+                      mlifeNumber: "MLF-8823491"
+                  payment:
+                    type: CREDIT_CARD
+                    token: "tok_visa_4242"
+                  addOns:
+                    - code: RESORT-FEE
+      responses:
+        '201':
+          description: Reservation created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationResponse'
+              examples:
+                created:
+                  summary: Confirmed reservation
+                  value:
+                    confirmationNumber: "HOTEL-2026-884421"
+                    status: CONFIRMED
+                    propertyId: GRAND-HOTEL-LV
+                    roomTypeCode: DELUXE-KING
+                    checkIn: "2026-06-01"
+                    checkOut: "2026-06-03"
+                    totalDue: 652.05
+                    createdAt: "2026-04-29T14:22:00Z"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          description: Room no longer available — inventory changed between availability check and booking attempt
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /reservations/{confirmationNumber}:
+    get:
+      tags: [Reservations]
+      summary: Retrieve reservation
+      description: Returns a full reservation record by confirmation number. Used by the booking confirmation page, guest service agents, and CI/CD integration test suites.
+      operationId: getReservation
+      x-api-owner: booking-services
+      parameters:
+        - $ref: '#/components/parameters/ConfirmationNumber'
+      responses:
+        '200':
+          description: Reservation retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags: [Reservations]
+      summary: Modify reservation
+      description: |
+        Modifies an existing reservation. Supports date changes, room type upgrades,
+        guest count updates, and add-on modifications. Returns the updated reservation
+        record with recalculated charges. Subject to rate plan change restrictions.
+      operationId: modifyReservation
+      x-api-owner: booking-services
+      parameters:
+        - $ref: '#/components/parameters/ConfirmationNumber'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModifyReservationRequest'
+      responses:
+        '200':
+          description: Reservation modified successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: Modification not permitted under current rate plan or reservation status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      tags: [Reservations]
+      summary: Cancel reservation
+      description: |
+        Cancels a reservation by confirmation number. Applies the cancellation policy
+        associated with the rate plan — non-refundable reservations will return a 200
+        with a penalty amount rather than a 422. Refund eligibility is returned in the
+        response body.
+      operationId: cancelReservation
+      x-api-owner: booking-services
+      parameters:
+        - $ref: '#/components/parameters/ConfirmationNumber'
+        - name: reason
+          in: query
+          description: Cancellation reason code for reporting.
+          schema:
+            type: string
+            enum: [GUEST_REQUEST, DUPLICATE_BOOKING, NO_SHOW, WEATHER, OTHER]
+      responses:
+        '200':
+          description: Reservation cancelled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CancellationResponse'
+              examples:
+                refundable:
+                  summary: Full refund cancellation
+                  value:
+                    confirmationNumber: "HOTEL-2026-884421"
+                    status: CANCELLED
+                    refundEligible: true
+                    refundAmount: 652.05
+                    cancelledAt: "2026-04-29T15:00:00Z"
+                non-refundable:
+                  summary: Non-refundable cancellation
+                  value:
+                    confirmationNumber: "HOTEL-2026-884422"
+                    status: CANCELLED
+                    refundEligible: false
+                    penaltyAmount: 438.00
+                    cancelledAt: "2026-04-29T15:00:00Z"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+
+  securitySchemes:
+    OAuth2ClientCredentials:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: /auth/token
+          scopes:
+            room-booking:read: Read availability and reservation data
+            room-booking:write: Create and modify reservations
+
+  parameters:
+    PropertyId:
+      name: propertyId
+      in: query
+      required: true
+      description: Hotel property identifier.
+      schema:
+        type: string
+        example: GRAND-HOTEL-LV
+
+    CheckIn:
+      name: checkIn
+      in: query
+      required: true
+      description: Check-in date in YYYY-MM-DD format.
+      schema:
+        type: string
+        format: date
+        example: "2026-06-01"
+
+    CheckOut:
+      name: checkOut
+      in: query
+      required: true
+      description: Check-out date in YYYY-MM-DD format. Must be after checkIn.
+      schema:
+        type: string
+        format: date
+        example: "2026-06-03"
+
+    Adults:
+      name: adults
+      in: query
+      required: true
+      description: Number of adult guests.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 4
+        example: 2
+
+    Children:
+      name: children
+      in: query
+      description: Number of child guests.
+      schema:
+        type: integer
+        minimum: 0
+        maximum: 4
+        default: 0
+
+    ConfirmationNumber:
+      name: confirmationNumber
+      in: path
+      required: true
+      description: Reservation confirmation number returned at booking time.
+      schema:
+        type: string
+        example: HOTEL-2026-884421
+
+  schemas:
+
+    HealthResponse:
+      type: object
+      required: [status, version, timestamp]
+      properties:
+        status:
+          type: string
+          enum: [UP, DEGRADED, DOWN]
+        version:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+
+    RateSummary:
+      type: object
+      description: Nightly rate breakdown including base rate, taxes, and total.
+      properties:
+        baseRate:
+          type: number
+          format: double
+          description: Pre-tax nightly room rate in USD.
+        taxRate:
+          type: number
+          format: double
+          description: Applicable tax amount for this night.
+        totalRate:
+          type: number
+          format: double
+          description: Total nightly rate including tax.
+
+    CalendarDay:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        available:
+          type: boolean
+        lowestRate:
+          type: number
+          format: double
+        rateSummary:
+          $ref: '#/components/schemas/RateSummary'
+        ratePlanCode:
+          type: string
+
+    CalendarAvailabilityResponse:
+      type: object
+      required: [propertyId, currency, days]
+      properties:
+        propertyId:
+          type: string
+        currency:
+          type: string
+          example: USD
+        days:
+          type: array
+          items:
+            $ref: '#/components/schemas/CalendarDay'
+
+    RoomOption:
+      type: object
+      properties:
+        roomTypeCode:
+          type: string
+        roomTypeName:
+          type: string
+        available:
+          type: boolean
+        nightlyRate:
+          type: number
+          format: double
+        totalBeforeTax:
+          type: number
+          format: double
+        taxAmount:
+          type: number
+          format: double
+        totalWithTax:
+          type: number
+          format: double
+        ratePlanCode:
+          type: string
+
+    TripAvailabilityResponse:
+      type: object
+      required: [propertyId, checkIn, checkOut, guests, rooms]
+      properties:
+        propertyId:
+          type: string
+        checkIn:
+          type: string
+          format: date
+        checkOut:
+          type: string
+          format: date
+        guests:
+          $ref: '#/components/schemas/GuestCount'
+        rooms:
+          type: array
+          items:
+            $ref: '#/components/schemas/RoomOption'
+
+    PropertyAvailabilitySummary:
+      type: object
+      properties:
+        propertyId:
+          type: string
+        propertyName:
+          type: string
+        lowestNightlyRate:
+          type: number
+          format: double
+        available:
+          type: boolean
+
+    AvailabilityGridResponse:
+      type: object
+      required: [checkIn, checkOut, grid]
+      properties:
+        checkIn:
+          type: string
+          format: date
+        checkOut:
+          type: string
+          format: date
+        grid:
+          type: array
+          items:
+            $ref: '#/components/schemas/PropertyAvailabilitySummary'
+
+    CreditDay:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        baseCredits:
+          type: integer
+        bonusCredits:
+          type: integer
+        totalCredits:
+          type: integer
+
+    CustomerCreditCalendarResponse:
+      type: object
+      required: [mlifeNumber, propertyId, creditEligible, days]
+      properties:
+        mlifeNumber:
+          type: string
+        propertyId:
+          type: string
+        creditEligible:
+          type: boolean
+        tierStatus:
+          type: string
+          enum: [SAPPHIRE, PEARL, GOLD, PLATINUM, NOIR]
+        days:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreditDay'
+
+    RatePlan:
+      type: object
+      properties:
+        code:
+          type: string
+        name:
+          type: string
+        segment:
+          type: string
+          enum: [LEISURE, CORPORATE, GROUP, MLIFE]
+        refundable:
+          type: boolean
+        cancellationPolicy:
+          type: string
+        minNights:
+          type: integer
+
+    RatePlanSearchResponse:
+      type: object
+      required: [propertyId, ratePlans]
+      properties:
+        propertyId:
+          type: string
+        ratePlans:
+          type: array
+          items:
+            $ref: '#/components/schemas/RatePlan'
+
+    AddOn:
+      type: object
+      properties:
+        code:
+          type: string
+          example: RESORT-FEE
+        description:
+          type: string
+        amount:
+          type: number
+          format: double
+
+    CalculateRoomChargesRequest:
+      type: object
+      required: [propertyId, roomTypeCode, ratePlanCode, checkIn, checkOut, guests]
+      properties:
+        propertyId:
+          type: string
+        roomTypeCode:
+          type: string
+        ratePlanCode:
+          type: string
+        checkIn:
+          type: string
+          format: date
+        checkOut:
+          type: string
+          format: date
+        guests:
+          $ref: '#/components/schemas/GuestCount'
+        addOns:
+          type: array
+          items:
+            $ref: '#/components/schemas/AddOn'
+
+    LineItem:
+      type: object
+      properties:
+        description:
+          type: string
+        amount:
+          type: number
+          format: double
+
+    RoomChargesResponse:
+      type: object
+      required: [propertyId, roomTypeCode, nights, lineItems, subtotal, taxAmount, totalDue, currency]
+      properties:
+        propertyId:
+          type: string
+        roomTypeCode:
+          type: string
+        nights:
+          type: integer
+        lineItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/LineItem'
+        subtotal:
+          type: number
+          format: double
+        taxAmount:
+          type: number
+          format: double
+        totalDue:
+          type: number
+          format: double
+        currency:
+          type: string
+
+    GuestCount:
+      type: object
+      required: [adults]
+      properties:
+        adults:
+          type: integer
+          minimum: 1
+        children:
+          type: integer
+          minimum: 0
+
+    GuestProfile:
+      type: object
+      required: [firstName, lastName, email]
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        mlifeNumber:
+          type: string
+
+    PaymentInfo:
+      type: object
+      required: [type, token]
+      properties:
+        type:
+          type: string
+          enum: [CREDIT_CARD, MLIFE_POINTS, GIFT_CARD]
+        token:
+          type: string
+          description: Tokenized payment reference from the payment gateway.
+
+    CreateReservationRequest:
+      type: object
+      required: [propertyId, roomTypeCode, ratePlanCode, checkIn, checkOut, guests, payment]
+      properties:
+        propertyId:
+          type: string
+        roomTypeCode:
+          type: string
+        ratePlanCode:
+          type: string
+        checkIn:
+          type: string
+          format: date
+        checkOut:
+          type: string
+          format: date
+        guests:
+          allOf:
+            - $ref: '#/components/schemas/GuestCount'
+            - type: object
+              properties:
+                primary:
+                  $ref: '#/components/schemas/GuestProfile'
+        payment:
+          $ref: '#/components/schemas/PaymentInfo'
+        addOns:
+          type: array
+          items:
+            $ref: '#/components/schemas/AddOn'
+        specialRequests:
+          type: string
+          maxLength: 500
+
+    ReservationResponse:
+      type: object
+      required: [confirmationNumber, status, propertyId, roomTypeCode, checkIn, checkOut, totalDue]
+      properties:
+        confirmationNumber:
+          type: string
+        status:
+          type: string
+          enum: [CONFIRMED, PENDING, CANCELLED, MODIFIED]
+        propertyId:
+          type: string
+        roomTypeCode:
+          type: string
+        checkIn:
+          type: string
+          format: date
+        checkOut:
+          type: string
+          format: date
+        totalDue:
+          type: number
+          format: double
+        createdAt:
+          type: string
+          format: date-time
+        modifiedAt:
+          type: string
+          format: date-time
+
+    ModifyReservationRequest:
+      type: object
+      properties:
+        checkIn:
+          type: string
+          format: date
+        checkOut:
+          type: string
+          format: date
+        roomTypeCode:
+          type: string
+        guests:
+          $ref: '#/components/schemas/GuestCount'
+        addOns:
+          type: array
+          items:
+            $ref: '#/components/schemas/AddOn'
+        specialRequests:
+          type: string
+
+    CancellationResponse:
+      type: object
+      required: [confirmationNumber, status, refundEligible, cancelledAt]
+      properties:
+        confirmationNumber:
+          type: string
+        status:
+          type: string
+          enum: [CANCELLED]
+        refundEligible:
+          type: boolean
+        refundAmount:
+          type: number
+          format: double
+        penaltyAmount:
+          type: number
+          format: double
+        cancelledAt:
+          type: string
+          format: date-time
+
+    ErrorResponse:
+      type: object
+      required: [code, message]
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        details:
+          type: array
+          items:
+            type: string
+
+  responses:
+    BadRequest:
+      description: Invalid request parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: INVALID_REQUEST
+            message: checkOut must be after checkIn
+
+    Unauthorized:
+      description: Missing or invalid OAuth2 token
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: UNAUTHORIZED
+            message: Bearer token is missing or expired
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: NOT_FOUND
+            message: No reservation found for the provided confirmation number
+
+    UnprocessableEntity:
+      description: Request is well-formed but cannot be processed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'

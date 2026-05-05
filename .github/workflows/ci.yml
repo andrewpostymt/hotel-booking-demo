@@ -1,0 +1,81 @@
+name: API CI/CD Pipeline
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'room-booking-core-services.openapi.yaml'
+      - 'postman/collections/**'
+      - '.github/workflows/ci.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'room-booking-core-services.openapi.yaml'
+      - 'postman/collections/**'
+  schedule:
+    - cron: "0 */6 * * *"
+
+permissions:
+  contents: read
+  checks: write
+
+jobs:
+
+  governance:
+    name: API Governance
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Postman CLI
+        run: curl -o- "https://dl-cli.pstmn.io/install/unix.sh" | sh
+      - name: Login to Postman CLI
+        run: postman login --with-api-key ${{ secrets.POSTMAN_API_KEY }}
+      - name: Run API Governance
+        run: postman api lint cf94d336-f13d-446b-9d1c-a760e11eb59b
+
+  test:
+    name: Smoke & Contract Tests
+    runs-on: ubuntu-latest
+    needs: governance
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Postman CLI
+        run: curl -o- "https://dl-cli.pstmn.io/install/unix.sh" | sh
+
+      - name: Login to Postman CLI
+        run: postman login --with-api-key ${{ secrets.POSTMAN_API_KEY }}
+
+      - name: Resolve Postman Resource IDs
+        run: |
+          ruby <<'RUBY'
+          require 'yaml'
+          config = YAML.load_file('.postman/resources.yaml') || {}
+          cloud = config.fetch('cloudResources', {})
+          collections = cloud.fetch('collections', {})
+          environments = cloud.fetch('environments', {})
+          smoke = collections.find { |path, _| path.include?('[Smoke]') }&.last
+          contract = collections.find { |path, _| path.include?('[Contract]') }&.last
+          environment = environments.find { |path, _| path.end_with?('/dev.postman_environment.json') }&.last || environments.values.first
+          missing = []
+          missing << 'smoke collection' unless smoke
+          missing << 'contract collection' unless contract
+          missing << 'environment' unless environment
+          abort("Missing Postman resource IDs in .postman/resources.yaml: #{missing.join(', ')}") unless missing.empty?
+          File.open(ENV.fetch('GITHUB_ENV'), 'a') do |file|
+            file.puts("POSTMAN_SMOKE_COLLECTION_UID=#{smoke}")
+            file.puts("POSTMAN_CONTRACT_COLLECTION_UID=#{contract}")
+            file.puts("POSTMAN_ENVIRONMENT_UID=#{environment}")
+          end
+          RUBY
+
+      - name: Run Smoke Tests
+        run: |
+          postman collection run "$POSTMAN_SMOKE_COLLECTION_UID" \
+            -e "$POSTMAN_ENVIRONMENT_UID" \
+            --report-events
+
+      - name: Run Contract Tests
+        run: |
+          postman collection run "$POSTMAN_CONTRACT_COLLECTION_UID" \
+            -e "$POSTMAN_ENVIRONMENT_UID" \
+            --report-events
