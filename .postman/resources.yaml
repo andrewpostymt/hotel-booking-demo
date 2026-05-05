@@ -1,30 +1,3 @@
-workspace:
-  id: 8efae25c-c592-46ce-89f7-7102faef61e8
-localResources:
-  collections:
-    - ../postman/collections/[Baseline] room-booking-core-services
-    - ../postman/collections/[Smoke] room-booking-core-services
-    - ../postman/collections/[Contract] room-booking-core-services
-  environments:
-    - ../postman/environments/dev.postman_environment.json
-    - ../postman/environments/qa2.postman_environment.json
-    - ../postman/environments/qa4.postman_environment.json
-    - ../postman/environments/preprod.postman_environment.json
-    - ../postman/environments/nonprod-dev.postman_environment.json
-    - ../postman/environments/nonprod-qa.postman_environment.json
-    - ../postman/environments/nonprod-stage.postman_environment.json
-    - ../postman/environments/nonprod-preprod.postman_environment.json
-cloudResources:
-  collections:
-    ../postman/collections/[Baseline] room-booking-core-services: 54514825-258e4ab7-a6b1-47b3-bb30-4c53d687a892
-    ../postman/collections/[Smoke] room-booking-core-services: 54514825-eb3723d1-266c-4508-8180-6a992699f24a
-    ../postman/collections/[Contract] room-booking-core-services: 54514825-15056d72-1d67-487c-ab92-8d846bdcfdb8
-  environments:
-    ../postman/environments/dev.postman_environment.json: 54514825-9c5d6d2d-9de1-4669-9140-89b894a6929a
-    ../postman/environments/qa2.postman_environment.json: 54514825-8ad55274-4f94-4631-8232-31a176d623a0
-    ../postman/environments/qa4.postman_environment.json: 54514825-f408c436-7f9b-426d-a178-b542658255e1
-    ../postman/environments/preprod.postman_environment.json: 54514825-5cf52355-675b-4388-a812-ed13aaa84a4b
-    ../postman/environments/nonprod-dev.postman_environment.json: 54514825-01c35951-1bfc-459b-a891-66b33b007866
-    ../postman/environments/nonprod-qa.postman_environment.json: 54514825-924abd1a-e366-4b9f-8d6d-a69d933a5e83
-    ../postman/environments/nonprod-stage.postman_environment.json: 54514825-bcffb744-4946-485d-8b34-5ee835b89b3c
-    ../postman/environments/nonprod-preprod.postman_environment.json: 54514825-11cc72bf-04d2-4d0f-baba-5bbb41e6bc33
+workspace: {}
+localResources: {}
+cloudResources: {}
