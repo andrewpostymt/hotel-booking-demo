@@ -31,7 +31,7 @@ jobs:
       - name: Login to Postman CLI
         run: postman login --with-api-key ${{ secrets.POSTMAN_API_KEY }}
       - name: Run API Governance
-        run: postman spec lint 5a2077f5-c00f-4669-a708-7d56e53ba95e --workspace-id 8efae25c-c592-46ce-89f7-7102faef61e8 --report-events
+        run: postman spec lint 3fee126f-1d8a-469f-a676-9f12d4b16c1d --workspace-id 8efae25c-c592-46ce-89f7-7102faef61e8 --report-events
 
   test:
     name: Smoke & Contract Tests
