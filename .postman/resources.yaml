@@ -38,3 +38,4 @@ cloudResources:
   specs:
     ../room-booking-core-services.openapi.yaml: 3fee126f-1d8a-469f-a676-9f12d4b16c1d
     ../recommendation-service.openapi.yaml: 2403a4c0-cce0-4647-9d6b-81c2890a7b5b
+    ../entertainment-nightlife-reservations.openapi.yaml: 5372c7c8-b34f-49bb-acc9-beebfbc777ec
