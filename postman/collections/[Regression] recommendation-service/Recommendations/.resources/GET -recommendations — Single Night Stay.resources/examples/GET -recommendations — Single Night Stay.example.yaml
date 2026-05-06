@@ -1,0 +1,15 @@
+$kind: http-example
+name: GET /recommendations — Single Night Stay
+request:
+  url: "{{baseUrl}}/recommendations"
+  method: GET
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  body:
+    type: json
+    content: '{"orderId": "ORD-2026-00124857", "propertyCode": "ARIA", "stayNights": 1, "roomCount": 1, "generatedAt": "2026-05-05T22:40:00Z", "recommendations": [{"rank": 1, "roomTypeCode": "DELUXE-KING", "roomTypeName": "Deluxe King Room", "score": 0.95, "ratePlanCode": "FLEX_RACK", "ratePlanName": "Flexible Rate", "nightly": 289.00, "total": 289.00, "currency": "USD", "showPackages": [{"showId": "SH-CIRQUE-001", "showName": "Cirque du Soleil – O", "ticketTier": "STANDARD", "pricePerPerson": 145.00}], "highlights": ["Strip view", "King bed", "Late checkout available"]}]}'
+order: 1000

@@ -1,0 +1,25 @@
+$kind: http-example
+name: POST /recommendations/event-stays — Happy Path
+request:
+  url: "{{baseUrl}}/recommendations/event-stays"
+  method: POST
+  body:
+    type: json
+    content: |-
+      {
+        "eventId": "EVT-BM-DOLBY-2026",
+        "eventName": "Bruno Mars at Dolby Live",
+        "propertyCode": "ARIA",
+        "preferredCheckIn": "2026-05-15",
+        "preferredCheckOut": "2026-05-17",
+        "roomCount": 1,
+        "guestCount": 2,
+        "orderId": null
+      }
+response:
+  statusCode: 201
+  statusText: Created
+  body:
+    type: json
+    content: '{"preferenceId": "PREF-2026-00001", "eventId": "EVT-BRUNOMARS-2026-06", "eventName": "Bruno Mars – An Intimate Night at Dolby Live", "propertyCode": "PARK_MGM", "submittedAt": "2026-05-05T22:40:00Z", "stayPreferences": {"checkIn": "2026-06-14", "checkOut": "2026-06-15", "adults": 2, "children": 0, "roomTypePreferences": ["DELUXE-KING", "PREMIUM-SUITE"], "budgetPerNight": {"min": 200, "max": 500, "currency": "USD"}}, "status": "PENDING_MATCH"}'
+order: 1000

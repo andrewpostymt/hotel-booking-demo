@@ -1,0 +1,18 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/health"
+  method: GET
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: '{"status":"healthy","version":"2.4.1","uptime":99.98,"timestamp":"2026-06-01T10:00:00Z","dependencies":{"database":"healthy","cache":"healthy","paymentGateway":"healthy"}}'
+order: 1000

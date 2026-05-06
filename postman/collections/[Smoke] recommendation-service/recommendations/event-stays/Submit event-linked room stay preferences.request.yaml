@@ -1,0 +1,102 @@
+$kind: http-request
+url: "{{baseUrl}}/recommendations/event-stays"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "eventId": "EVT-BM-DOLBY-2026",
+      "eventName": "Bruno Mars at Dolby Live",
+      "propertyCode": "ARIA",
+      "preferredCheckIn": "2026-05-15",
+      "preferredCheckOut": "2026-05-17",
+      "roomCount": 1,
+      "guestCount": 2,
+      "orderId": null
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "eventId": {
+          "type": "string",
+          "example": "EVT-BM-DOLBY-2026",
+          "description": "Internal event identifier"
+        },
+        "eventName": {
+          "type": "string",
+          "example": "Bruno Mars at Dolby Live",
+          "description": "Display name of the event"
+        },
+        "propertyCode": {
+          "type": "string",
+          "example": "ARIA",
+          "description": "Hotel property where the event is held"
+        },
+        "preferredCheckIn": {
+          "type": "string",
+          "example": "2026-05-15",
+          "description": "Preferred check-in date (YYYY-MM-DD)",
+          "format": "date"
+        },
+        "preferredCheckOut": {
+          "type": "string",
+          "example": "2026-05-17",
+          "description": "Preferred check-out date (YYYY-MM-DD)",
+          "format": "date"
+        },
+        "roomCount": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10,
+          "example": 1,
+          "description": "Number of rooms needed"
+        },
+        "guestCount": {
+          "type": "integer",
+          "minimum": 1,
+          "example": 2,
+          "description": "Total number of guests"
+        },
+        "orderId": {
+          "type": "string",
+          "example": null,
+          "description": "Existing order ID if the guest already has a booking; null for new searches"
+        }
+      },
+      "required": [
+        "eventId",
+        "eventName",
+        "propertyCode",
+        "preferredCheckIn",
+        "preferredCheckOut",
+        "roomCount",
+        "guestCount"
+      ]
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      // [Smoke] Auto-generated test assertions
+
+      pm.test('Status code is successful (2xx)', function () {
+          pm.response.to.be.success;
+      });
+
+      pm.test('Response time is acceptable', function () {
+          var threshold = parseInt(pm.environment.get('RESPONSE_TIME_THRESHOLD') || '2000', 10);
+          pm.expect(pm.response.responseTime).to.be.below(threshold);
+      });
+
+      pm.test('Response body is not empty', function () {
+          if (pm.response.code !== 204) {
+              var body = pm.response.text();
+              pm.expect(body.length).to.be.above(0);
+          }
+      });
+    language: text/javascript
+examples: ./.resources/Submit event-linked room stay preferences.resources/examples
+order: 1000

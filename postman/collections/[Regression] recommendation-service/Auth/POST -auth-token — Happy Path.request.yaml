@@ -1,0 +1,54 @@
+$kind: http-request
+name: POST /auth/token — Happy Path
+url: "{{baseUrl}}/auth/token"
+method: POST
+headers:
+  Content-Type: application/x-www-form-urlencoded
+body:
+  type: urlencoded
+  content:
+    grant_type: client_credentials
+    client_id: "{{clientId}}"
+    client_secret: "{{clientSecret}}"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status code is 200", function () {
+          pm.response.to.have.status(200);
+      });
+
+      pm.test("Response has access_token", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("access_token");
+          pm.expect(json.access_token).to.be.a("string").and.not.empty;
+      });
+
+      pm.test("token_type is Bearer", function () {
+          const json = pm.response.json();
+          pm.expect(json.token_type).to.eql("Bearer");
+      });
+
+      pm.test("expires_in is present and is a number", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("expires_in");
+          pm.expect(json.expires_in).to.be.a("number");
+      });
+
+      pm.test("expires_in equals 3600", function () {
+          const json = pm.response.json();
+          pm.expect(json.expires_in).to.eql(3600);
+      });
+
+      pm.test("Response time is under 2000ms", function () {
+          pm.expect(pm.response.responseTime).to.be.below(2000);
+      });
+
+      // Store token for subsequent requests
+      if (pm.response.code === 200) {
+          const json = pm.response.json();
+          pm.environment.set("accessToken", json.access_token);
+          pm.environment.set("tokenExpiry", Date.now() + (json.expires_in * 1000));
+      }
+    language: text/javascript
+examples: ./.resources/POST -auth-token — Happy Path.resources/examples
+order: 1000

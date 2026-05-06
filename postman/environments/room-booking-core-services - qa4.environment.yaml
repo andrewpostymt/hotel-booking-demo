@@ -1,0 +1,24 @@
+name: room-booking-core-services - qa4
+values:
+  - key: baseUrl
+    value: ""
+    enabled: true
+  - key: CI
+    value: "false"
+    enabled: true
+  - key: RESPONSE_TIME_THRESHOLD
+    value: "2000"
+    enabled: true
+  - key: AWS_ACCESS_KEY_ID
+    value: ""
+    enabled: true
+  - key: AWS_SECRET_ACCESS_KEY
+    value: ""
+    enabled: true
+  - key: AWS_REGION
+    value: eu-west-2
+    enabled: true
+  - key: AWS_SECRET_NAME
+    value: api-credentials-qa4
+    enabled: true
+color: null

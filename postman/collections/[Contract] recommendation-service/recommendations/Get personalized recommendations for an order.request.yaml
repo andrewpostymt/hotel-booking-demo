@@ -1,0 +1,536 @@
+$kind: http-request
+description: |
+  Returns a ranked list of cross-sell and upsell offers for a given order context.
+  Recommendations are personalized based on the guest's order history, stay parameters,
+  and property-level availability. Set `showsOnly=true` to filter to entertainment
+  offers exclusively (used in the post-booking shows upsell flow).
+
+  The `stayNights` parameter drives offer selection logic:
+  - `stayNights=1`: single-night offers, show add-ons, dining
+  - `stayNights=3`: multi-night packages, resort credits, extended stay incentives
+url: "{{baseUrl}}/recommendations?orderId=ORD-2026-00124857&roomCount=1&stayNights=3&showsOnly=false&propertyCode=ARIA"
+method: GET
+headers:
+  Accept: application/json
+queryParams:
+  - key: orderId
+    value: ORD-2026-00124857
+    description: Unique identifier of the confirmed booking order
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "example": "ORD-2026-00124857"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+  - key: roomCount
+    value: "1"
+    description: Number of rooms in the order — influences bundle sizing for recommendations
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "integer",
+            "default": 1,
+            "minimum": 1,
+            "maximum": 10,
+            "example": 1
+          }
+        }
+      }
+  - key: stayNights
+    value: "3"
+    description: Length of stay in nights — drives offer selection logic
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "integer",
+            "default": 1,
+            "enum": [
+              1,
+              3
+            ],
+            "example": 3
+          }
+        }
+      }
+  - key: showsOnly
+    value: "false"
+    description: |
+      When true, filters recommendations to entertainment and show offers only.
+      Used in the post-booking upsell flow for guests who have not added show tickets.
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "boolean",
+            "default": false,
+            "example": false
+          }
+        }
+      }
+  - key: propertyCode
+    value: ARIA
+    description: Hotel property code to scope recommendations to a specific property
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "example": "ARIA"
+          }
+        }
+      }
+scripts:
+  - type: afterResponse
+    code: |-
+      var contract = JSON.parse("{\"method\":\"GET\",\"path\":\"/recommendations\",\"responses\":{\"200\":{\"content\":{\"application/json\":{\"schema\":{\"type\":\"object\",\"required\":[\"orderId\",\"recommendations\",\"generatedAt\",\"totalCount\"],\"properties\":{\"orderId\":{\"type\":\"string\"},\"propertyCode\":{\"type\":\"string\"},\"recommendations\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"required\":[\"offerId\",\"offerType\",\"title\",\"price\",\"currency\",\"rank\"],\"properties\":{\"offerId\":{\"type\":\"string\"},\"offerType\":{\"type\":\"string\",\"enum\":[\"entertainment\",\"dining\",\"resort_package\",\"room_upgrade\",\"transportation\"]},\"title\":{\"type\":\"string\"},\"description\":{\"type\":\"string\"},\"price\":{\"type\":\"number\"},\"currency\":{\"type\":\"string\"},\"rank\":{\"type\":\"integer\",\"minimum\":1},\"availableQuantity\":{\"type\":\"integer\"},\"expiresAt\":{\"type\":\"string\"}}}},\"generatedAt\":{\"type\":\"string\"},\"totalCount\":{\"type\":\"integer\"}},\"$schema\":\"https://json-schema.org/draft/2020-12/schema\"}}},\"hasBody\":true,\"headers\":[]},\"400\":{\"content\":{\"application/json\":{\"schema\":{\"type\":\"object\",\"required\":[\"code\",\"message\"],\"properties\":{\"code\":{\"type\":\"string\"},\"message\":{\"type\":\"string\"},\"detail\":{\"type\":\"string\"},\"traceId\":{\"type\":\"string\"}},\"$schema\":\"https://json-schema.org/draft/2020-12/schema\"}}},\"hasBody\":true,\"headers\":[]},\"401\":{\"content\":{\"application/json\":{\"schema\":{\"type\":\"object\",\"required\":[\"code\",\"message\"],\"properties\":{\"code\":{\"type\":\"string\"},\"message\":{\"type\":\"string\"},\"detail\":{\"type\":\"string\"},\"traceId\":{\"type\":\"string\"}},\"$schema\":\"https://json-schema.org/draft/2020-12/schema\"}}},\"hasBody\":true,\"headers\":[]},\"404\":{\"content\":{\"application/json\":{\"schema\":{\"type\":\"object\",\"required\":[\"code\",\"message\"],\"properties\":{\"code\":{\"type\":\"string\"},\"message\":{\"type\":\"string\"},\"detail\":{\"type\":\"string\"},\"traceId\":{\"type\":\"string\"}},\"$schema\":\"https://json-schema.org/draft/2020-12/schema\"}}},\"hasBody\":true,\"headers\":[]}}}");
+      var validators = {};
+      validators["200"] = validators["200"] || {};
+      validators["200"]["application/json"] = (function() {
+      'use strict'
+      const hasOwn = Function.prototype.call.bind(Object.prototype.hasOwnProperty);
+      const ref0 = function validate(data) {
+        validate.errors = null
+        let errorCount = 0
+        if (!(typeof data === "object" && data && !Array.isArray(data))) {
+          if (validate.errors === null) validate.errors = []
+          validate.errors.push({ keywordLocation: "#/type", instanceLocation: "#" })
+          errorCount++
+        }
+        else {
+          if (!(data.orderId !== undefined && hasOwn(data, "orderId"))) {
+            if (validate.errors === null) validate.errors = []
+            validate.errors.push({ keywordLocation: "#/required", instanceLocation: "#/orderId" })
+            errorCount++
+          }
+          if (!(data.recommendations !== undefined && hasOwn(data, "recommendations"))) {
+            if (validate.errors === null) validate.errors = []
+            validate.errors.push({ keywordLocation: "#/required", instanceLocation: "#/recommendations" })
+            errorCount++
+          }
+          if (!(data.generatedAt !== undefined && hasOwn(data, "generatedAt"))) {
+            if (validate.errors === null) validate.errors = []
+            validate.errors.push({ keywordLocation: "#/required", instanceLocation: "#/generatedAt" })
+            errorCount++
+          }
+          if (!(data.totalCount !== undefined && hasOwn(data, "totalCount"))) {
+            if (validate.errors === null) validate.errors = []
+            validate.errors.push({ keywordLocation: "#/required", instanceLocation: "#/totalCount" })
+            errorCount++
+          }
+          if (data.orderId !== undefined && hasOwn(data, "orderId")) {
+            if (!(typeof data.orderId === "string")) {
+              if (validate.errors === null) validate.errors = []
+              validate.errors.push({ keywordLocation: "#/properties/orderId/type", instanceLocation: "#/orderId" })
+              errorCount++
+            }
+          }
+          if (data.propertyCode !== undefined && hasOwn(data, "propertyCode")) {
+            if (!(typeof data.propertyCode === "string")) {
+              if (validate.errors === null) validate.errors = []
+              validate.errors.push({ keywordLocation: "#/properties/propertyCode/type", instanceLocation: "#/propertyCode" })
+              errorCount++
+            }
+          }
+          if (data.recommendations !== undefined && hasOwn(data, "recommendations")) {
+            if (!Array.isArray(data.recommendations)) {
+              if (validate.errors === null) validate.errors = []
+              validate.errors.push({ keywordLocation: "#/properties/recommendations/type", instanceLocation: "#/recommendations" })
+              errorCount++
+            }
+            else {
+              for (let i = 0; i < data.recommendations.length; i++) {
+                if (data.recommendations[i] !== undefined && hasOwn(data.recommendations, i)) {
+                  if (!(typeof data.recommendations[i] === "object" && data.recommendations[i] && !Array.isArray(data.recommendations[i]))) {
+                    if (validate.errors === null) validate.errors = []
+                    validate.errors.push({ keywordLocation: "#/properties/recommendations/items/type", instanceLocation: "#/recommendations/"+i })
+                    errorCount++
+                  }
+                  else {
+                    if (!(data.recommendations[i].offerId !== undefined && hasOwn(data.recommendations[i], "offerId"))) {
+                      if (validate.errors === null) validate.errors = []
+                      validate.errors.push({ keywordLocation: "#/properties/recommendations/items/required", instanceLocation: "#/recommendations/"+i+"/offerId" })
+                      errorCount++
+                    }
+                    if (!(data.recommendations[i].offerType !== undefined && hasOwn(data.recommendations[i], "offerType"))) {
+                      if (validate.errors === null) validate.errors = []
+                      validate.errors.push({ keywordLocation: "#/properties/recommendations/items/required", instanceLocation: "#/recommendations/"+i+"/offerType" })
+                      errorCount++
+                    }
+                    if (!(data.recommendations[i].title !== undefined && hasOwn(data.recommendations[i], "title"))) {
+                      if (validate.errors === null) validate.errors = []
+                      validate.errors.push({ keywordLocation: "#/properties/recommendations/items/required", instanceLocation: "#/recommendations/"+i+"/title" })
+                      errorCount++
+                    }
+                    if (!(data.recommendations[i].price !== undefined && hasOwn(data.recommendations[i], "price"))) {
+                      if (validate.errors === null) validate.errors = []
+                      validate.errors.push({ keywordLocation: "#/properties/recommendations/items/required", instanceLocation: "#/recommendations/"+i+"/price" })
+                      errorCount++
+                    }
+                    if (!(data.recommendations[i].currency !== undefined && hasOwn(data.recommendations[i], "currency"))) {
+                      if (validate.errors === null) validate.errors = []
+                      validate.errors.push({ keywordLocation: "#/properties/recommendations/items/required", instanceLocation: "#/recommendations/"+i+"/currency" })
+                      errorCount++
+                    }
+                    if (!(data.recommendations[i].rank !== undefined && hasOwn(data.recommendations[i], "rank"))) {
+                      if (validate.errors === null) validate.errors = []
+                      validate.errors.push({ keywordLocation: "#/properties/recommendations/items/required", instanceLocation: "#/recommendations/"+i+"/rank" })
+                      errorCount++
+                    }
+                    if (data.recommendations[i].offerId !== undefined && hasOwn(data.recommendations[i], "offerId")) {
+                      if (!(typeof data.recommendations[i].offerId === "string")) {
+                        if (validate.errors === null) validate.errors = []
+                        validate.errors.push({ keywordLocation: "#/properties/recommendations/items/properties/offerId/type", instanceLocation: "#/recommendations/"+i+"/offerId" })
+                        errorCount++
+                      }
+                    }
+                    if (data.recommendations[i].offerType !== undefined && hasOwn(data.recommendations[i], "offerType")) {
+                      if (!(typeof data.recommendations[i].offerType === "string")) {
+                        if (validate.errors === null) validate.errors = []
+                        validate.errors.push({ keywordLocation: "#/properties/recommendations/items/properties/offerType/type", instanceLocation: "#/recommendations/"+i+"/offerType" })
+                        errorCount++
+                      }
+                      else {
+                        if (!(data.recommendations[i].offerType === "entertainment" || data.recommendations[i].offerType === "dining" || data.recommendations[i].offerType === "resort_package" || data.recommendations[i].offerType === "room_upgrade" || data.recommendations[i].offerType === "transportation")) {
+                          if (validate.errors === null) validate.errors = []
+                          validate.errors.push({ keywordLocation: "#/properties/recommendations/items/properties/offerType/enum", instanceLocation: "#/recommendations/"+i+"/offerType" })
+                          errorCount++
+                        }
+                      }
+                    }
+                    if (data.recommendations[i].title !== undefined && hasOwn(data.recommendations[i], "title")) {
+                      if (!(typeof data.recommendations[i].title === "string")) {
+                        if (validate.errors === null) validate.errors = []
+                        validate.errors.push({ keywordLocation: "#/properties/recommendations/items/properties/title/type", instanceLocation: "#/recommendations/"+i+"/title" })
+                        errorCount++
+                      }
+                    }
+                    if (data.recommendations[i].description !== undefined && hasOwn(data.recommendations[i], "description")) {
+                      if (!(typeof data.recommendations[i].description === "string")) {
+                        if (validate.errors === null) validate.errors = []
+                        validate.errors.push({ keywordLocation: "#/properties/recommendations/items/properties/description/type", instanceLocation: "#/recommendations/"+i+"/description" })
+                        errorCount++
+                      }
+                    }
+                    if (data.recommendations[i].price !== undefined && hasOwn(data.recommendations[i], "price")) {
+                      if (!(typeof data.recommendations[i].price === "number")) {
+                        if (validate.errors === null) validate.errors = []
+                        validate.errors.push({ keywordLocation: "#/properties/recommendations/items/properties/price/type", instanceLocation: "#/recommendations/"+i+"/price" })
+                        errorCount++
+                      }
+                    }
+                    if (data.recommendations[i].currency !== undefined && hasOwn(data.recommendations[i], "currency")) {
+                      if (!(typeof data.recommendations[i].currency === "string")) {
+                        if (validate.errors === null) validate.errors = []
+                        validate.errors.push({ keywordLocation: "#/properties/recommendations/items/properties/currency/type", instanceLocation: "#/recommendations/"+i+"/currency" })
+                        errorCount++
+                      }
+                    }
+                    if (data.recommendations[i].rank !== undefined && hasOwn(data.recommendations[i], "rank")) {
+                      if (!(Number.isInteger(data.recommendations[i].rank))) {
+                        if (validate.errors === null) validate.errors = []
+                        validate.errors.push({ keywordLocation: "#/properties/recommendations/items/properties/rank/type", instanceLocation: "#/recommendations/"+i+"/rank" })
+                        errorCount++
+                      }
+                      else {
+                        if (!(1 <= data.recommendations[i].rank)) {
+                          if (validate.errors === null) validate.errors = []
+                          validate.errors.push({ keywordLocation: "#/properties/recommendations/items/properties/rank/minimum", instanceLocation: "#/recommendations/"+i+"/rank" })
+                          errorCount++
+                        }
+                      }
+                    }
+                    if (data.recommendations[i].availableQuantity !== undefined && hasOwn(data.recommendations[i], "availableQuantity")) {
+                      if (!(Number.isInteger(data.recommendations[i].availableQuantity))) {
+                        if (validate.errors === null) validate.errors = []
+                        validate.errors.push({ keywordLocation: "#/properties/recommendations/items/properties/availableQuantity/type", instanceLocation: "#/recommendations/"+i+"/availableQuantity" })
+                        errorCount++
+                      }
+                    }
+                    if (data.recommendations[i].expiresAt !== undefined && hasOwn(data.recommendations[i], "expiresAt")) {
+                      if (!(typeof data.recommendations[i].expiresAt === "string")) {
+                        if (validate.errors === null) validate.errors = []
+                        validate.errors.push({ keywordLocation: "#/properties/recommendations/items/properties/expiresAt/type", instanceLocation: "#/recommendations/"+i+"/expiresAt" })
+                        errorCount++
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+          if (data.generatedAt !== undefined && hasOwn(data, "generatedAt")) {
+            if (!(typeof data.generatedAt === "string")) {
+              if (validate.errors === null) validate.errors = []
+              validate.errors.push({ keywordLocation: "#/properties/generatedAt/type", instanceLocation: "#/generatedAt" })
+              errorCount++
+            }
+          }
+          if (data.totalCount !== undefined && hasOwn(data, "totalCount")) {
+            if (!Number.isInteger(data.totalCount)) {
+              if (validate.errors === null) validate.errors = []
+              validate.errors.push({ keywordLocation: "#/properties/totalCount/type", instanceLocation: "#/totalCount" })
+              errorCount++
+            }
+          }
+        }
+        return errorCount === 0
+      };
+      return ref0})();;
+      validators["400"] = validators["400"] || {};
+      validators["400"]["application/json"] = (function() {
+      'use strict'
+      const hasOwn = Function.prototype.call.bind(Object.prototype.hasOwnProperty);
+      const ref0 = function validate(data) {
+        validate.errors = null
+        let errorCount = 0
+        if (!(typeof data === "object" && data && !Array.isArray(data))) {
+          if (validate.errors === null) validate.errors = []
+          validate.errors.push({ keywordLocation: "#/type", instanceLocation: "#" })
+          errorCount++
+        }
+        else {
+          if (!(data.code !== undefined && hasOwn(data, "code"))) {
+            if (validate.errors === null) validate.errors = []
+            validate.errors.push({ keywordLocation: "#/required", instanceLocation: "#/code" })
+            errorCount++
+          }
+          if (!(data.message !== undefined && hasOwn(data, "message"))) {
+            if (validate.errors === null) validate.errors = []
+            validate.errors.push({ keywordLocation: "#/required", instanceLocation: "#/message" })
+            errorCount++
+          }
+          if (data.code !== undefined && hasOwn(data, "code")) {
+            if (!(typeof data.code === "string")) {
+              if (validate.errors === null) validate.errors = []
+              validate.errors.push({ keywordLocation: "#/properties/code/type", instanceLocation: "#/code" })
+              errorCount++
+            }
+          }
+          if (data.message !== undefined && hasOwn(data, "message")) {
+            if (!(typeof data.message === "string")) {
+              if (validate.errors === null) validate.errors = []
+              validate.errors.push({ keywordLocation: "#/properties/message/type", instanceLocation: "#/message" })
+              errorCount++
+            }
+          }
+          if (data.detail !== undefined && hasOwn(data, "detail")) {
+            if (!(typeof data.detail === "string")) {
+              if (validate.errors === null) validate.errors = []
+              validate.errors.push({ keywordLocation: "#/properties/detail/type", instanceLocation: "#/detail" })
+              errorCount++
+            }
+          }
+          if (data.traceId !== undefined && hasOwn(data, "traceId")) {
+            if (!(typeof data.traceId === "string")) {
+              if (validate.errors === null) validate.errors = []
+              validate.errors.push({ keywordLocation: "#/properties/traceId/type", instanceLocation: "#/traceId" })
+              errorCount++
+            }
+          }
+        }
+        return errorCount === 0
+      };
+      return ref0})();;
+      validators["401"] = validators["401"] || {};
+      validators["401"]["application/json"] = (function() {
+      'use strict'
+      const hasOwn = Function.prototype.call.bind(Object.prototype.hasOwnProperty);
+      const ref0 = function validate(data) {
+        validate.errors = null
+        let errorCount = 0
+        if (!(typeof data === "object" && data && !Array.isArray(data))) {
+          if (validate.errors === null) validate.errors = []
+          validate.errors.push({ keywordLocation: "#/type", instanceLocation: "#" })
+          errorCount++
+        }
+        else {
+          if (!(data.code !== undefined && hasOwn(data, "code"))) {
+            if (validate.errors === null) validate.errors = []
+            validate.errors.push({ keywordLocation: "#/required", instanceLocation: "#/code" })
+            errorCount++
+          }
+          if (!(data.message !== undefined && hasOwn(data, "message"))) {
+            if (validate.errors === null) validate.errors = []
+            validate.errors.push({ keywordLocation: "#/required", instanceLocation: "#/message" })
+            errorCount++
+          }
+          if (data.code !== undefined && hasOwn(data, "code")) {
+            if (!(typeof data.code === "string")) {
+              if (validate.errors === null) validate.errors = []
+              validate.errors.push({ keywordLocation: "#/properties/code/type", instanceLocation: "#/code" })
+              errorCount++
+            }
+          }
+          if (data.message !== undefined && hasOwn(data, "message")) {
+            if (!(typeof data.message === "string")) {
+              if (validate.errors === null) validate.errors = []
+              validate.errors.push({ keywordLocation: "#/properties/message/type", instanceLocation: "#/message" })
+              errorCount++
+            }
+          }
+          if (data.detail !== undefined && hasOwn(data, "detail")) {
+            if (!(typeof data.detail === "string")) {
+              if (validate.errors === null) validate.errors = []
+              validate.errors.push({ keywordLocation: "#/properties/detail/type", instanceLocation: "#/detail" })
+              errorCount++
+            }
+          }
+          if (data.traceId !== undefined && hasOwn(data, "traceId")) {
+            if (!(typeof data.traceId === "string")) {
+              if (validate.errors === null) validate.errors = []
+              validate.errors.push({ keywordLocation: "#/properties/traceId/type", instanceLocation: "#/traceId" })
+              errorCount++
+            }
+          }
+        }
+        return errorCount === 0
+      };
+      return ref0})();;
+      validators["404"] = validators["404"] || {};
+      validators["404"]["application/json"] = (function() {
+      'use strict'
+      const hasOwn = Function.prototype.call.bind(Object.prototype.hasOwnProperty);
+      const ref0 = function validate(data) {
+        validate.errors = null
+        let errorCount = 0
+        if (!(typeof data === "object" && data && !Array.isArray(data))) {
+          if (validate.errors === null) validate.errors = []
+          validate.errors.push({ keywordLocation: "#/type", instanceLocation: "#" })
+          errorCount++
+        }
+        else {
+          if (!(data.code !== undefined && hasOwn(data, "code"))) {
+            if (validate.errors === null) validate.errors = []
+            validate.errors.push({ keywordLocation: "#/required", instanceLocation: "#/code" })
+            errorCount++
+          }
+          if (!(data.message !== undefined && hasOwn(data, "message"))) {
+            if (validate.errors === null) validate.errors = []
+            validate.errors.push({ keywordLocation: "#/required", instanceLocation: "#/message" })
+            errorCount++
+          }
+          if (data.code !== undefined && hasOwn(data, "code")) {
+            if (!(typeof data.code === "string")) {
+              if (validate.errors === null) validate.errors = []
+              validate.errors.push({ keywordLocation: "#/properties/code/type", instanceLocation: "#/code" })
+              errorCount++
+            }
+          }
+          if (data.message !== undefined && hasOwn(data, "message")) {
+            if (!(typeof data.message === "string")) {
+              if (validate.errors === null) validate.errors = []
+              validate.errors.push({ keywordLocation: "#/properties/message/type", instanceLocation: "#/message" })
+              errorCount++
+            }
+          }
+          if (data.detail !== undefined && hasOwn(data, "detail")) {
+            if (!(typeof data.detail === "string")) {
+              if (validate.errors === null) validate.errors = []
+              validate.errors.push({ keywordLocation: "#/properties/detail/type", instanceLocation: "#/detail" })
+              errorCount++
+            }
+          }
+          if (data.traceId !== undefined && hasOwn(data, "traceId")) {
+            if (!(typeof data.traceId === "string")) {
+              if (validate.errors === null) validate.errors = []
+              validate.errors.push({ keywordLocation: "#/properties/traceId/type", instanceLocation: "#/traceId" })
+              errorCount++
+            }
+          }
+        }
+        return errorCount === 0
+      };
+      return ref0})();;
+      function selectedResponseContract() {
+        var status = String(pm.response.code);
+        if (contract.responses[status]) return { key: status, value: contract.responses[status] };
+        var range = String(Math.floor(pm.response.code / 100)) + 'XX';
+        if (contract.responses[range]) return { key: range, value: contract.responses[range] };
+        if (contract.responses.default) return { key: 'default', value: contract.responses.default };
+        return null;
+      }
+      function responseText() { return pm.response.text() || ""; }
+      function isBodyless() { return pm.response.code === 204 || pm.response.code === 205 || pm.response.code === 304 || contract.method === "HEAD"; }
+      function mediaBase(value) { return String(value || "").toLowerCase().split(";")[0].trim(); }
+      function mediaParts(value) { var base = mediaBase(value); var parts = base.split("/"); return { raw: base, type: parts[0] || "", subtype: parts[1] || "" }; }
+      function isJsonSubtype(subtype) { return subtype === "json" || /\+json$/.test(subtype); }
+      function mediaScore(expected, actual) {
+        var e = mediaParts(expected); var a = mediaParts(actual);
+        if (!e.raw || !a.raw) return 0;
+        if (e.raw === a.raw) return 4;
+        if (e.type === a.type && e.subtype === "json" && isJsonSubtype(a.subtype)) return 3;
+        if (e.type === a.type && e.subtype === "*+json" && /\+json$/.test(a.subtype)) return 3;
+        if (e.type === a.type && e.subtype === "*") return 2;
+        if (e.type === "*" && e.subtype === "*") return 1;
+        return 0;
+      }
+      function selectMedia(responseContract) {
+        var actual = pm.response.headers.get("Content-Type") || "";
+        var content = responseContract.content || {};
+        var matches = Object.keys(content).map(function (expected) { return { expected: expected, score: mediaScore(expected, actual), media: content[expected] }; }).filter(function (entry) { return entry.score > 0; }).sort(function (a, b) { return b.score - a.score; });
+        if (matches.length === 0) return { error: "Content-Type " + actual + " does not match OpenAPI content for " + contract.method + " " + contract.path + " status " + pm.response.code + "; expected " + Object.keys(content).join(", ") };
+        if (matches.length > 1 && matches[0].score === matches[1].score) return { error: "Content-Type " + actual + " ambiguously matches OpenAPI content for " + contract.method + " " + contract.path + " status " + pm.response.code + "; expected " + Object.keys(content).join(", ") };
+        return matches[0];
+      }
+      var selected = selectedResponseContract();
+      pm.test('OpenAPI operation mapping exists', function () { pm.expect(contract.path).to.be.a('string').and.not.empty; });
+      pm.test('Status code is defined by OpenAPI', function () { pm.expect(selected, 'No OpenAPI response defined for ' + contract.method + ' ' + contract.path + ' status ' + pm.response.code).to.exist; });
+      pm.test('Response headers match OpenAPI', function () {
+        if (!selected) return;
+        var headers = selected.value.headers || [];
+        headers.forEach(function (header) {
+          var actual = pm.response.headers.get(header.name);
+          if (!actual && header.required) pm.expect.fail("OpenAPI response header missing for " + contract.method + " " + contract.path + ": " + header.name);
+          if (!actual) return;
+          if (header.unsupported) pm.expect.fail("OpenAPI response header unsupported for " + contract.method + " " + contract.path + ": " + header.unsupported);
+          var headerValidator = validators[selected.key] && validators[selected.key].__headers && validators[selected.key].__headers[String(header.name).toLowerCase()];
+          if (headerValidator && !headerValidator(actual)) pm.expect.fail("OpenAPI response header validation failed for " + header.name + ": " + JSON.stringify(headerValidator.errors || []));
+        });
+      });
+      pm.test('Response body matches OpenAPI body contract', function () {
+        if (!selected) return;
+        if (isBodyless()) { pm.expect(responseText().trim().length).to.equal(0); return; }
+        var content = selected.value.content || {};
+        if (Object.keys(content).length === 0) { pm.expect(responseText().trim().length, "OpenAPI response defines no body but response body was not empty").to.equal(0); }
+        else { pm.expect(responseText().trim().length, "OpenAPI response defines a body but response body was empty").to.be.above(0); }
+      });
+      pm.test('Content-Type matches OpenAPI response content', function () {
+        if (!selected || isBodyless()) return;
+        var content = selected.value.content || {};
+        if (Object.keys(content).length === 0) return;
+        var actual = pm.response.headers.get("Content-Type");
+        if (!actual) pm.expect.fail("Content-Type <missing> does not match OpenAPI content for " + contract.method + " " + contract.path + " status " + pm.response.code + "; expected " + Object.keys(content).join(", "));
+        var media = selectMedia(selected.value);
+        if (media.error) pm.expect.fail(media.error);
+      });
+      pm.test('Response body matches OpenAPI schema', function () {
+        if (!selected || isBodyless()) return;
+        var content = selected.value.content || {};
+        if (Object.keys(content).length === 0) return;
+        var media = selectMedia(selected.value);
+        if (media.error) return;
+        if (media.media.unsupported) pm.expect.fail("OpenAPI schema unsupported for " + contract.method + " " + contract.path + " status " + pm.response.code + ": " + media.media.unsupported);
+        if (!media.media.schema) { return; }
+        var validate = validators[selected.key] && validators[selected.key][media.expected];
+        if (!validate) pm.expect.fail("OpenAPI schema validator was not generated for " + media.expected);
+        var actual = mediaParts(pm.response.headers.get("Content-Type") || "");
+        var value = isJsonSubtype(actual.subtype) ? pm.response.json() : responseText();
+        if (!isJsonSubtype(actual.subtype) && media.media.schema && media.media.schema.type !== "string") pm.expect.fail("Non-JSON response schema validation unsupported for " + contract.method + " " + contract.path);
+        if (!validate(value)) pm.expect.fail("OpenAPI schema validation failed for " + contract.method + " " + contract.path + " status " + pm.response.code + ": " + JSON.stringify(validate.errors || []));
+      });
+    language: text/javascript
+examples: ./.resources/Get personalized recommendations for an order.resources/examples
+order: 3000

@@ -1,0 +1,60 @@
+$kind: http-request
+name: GET /availability/grid — Happy Path
+url: "{{baseUrl}}/availability/grid?checkIn=2026-06-01&checkOut=2026-06-03&adults=2&propertyIds=GRAND-HOTEL-LV,PALACE-HOTEL-LV,SUMMIT-HOTEL-LV"
+method: GET
+description: |-
+  Returns a cross-property availability grid for three properties (GRAND-HOTEL-LV, PALACE-HOTEL-LV, SUMMIT-HOTEL-LV) from 2026-06-01 to 2026-06-03 for 2 adults. Tests assert `checkIn` and `checkOut` echo back correctly, the `grid` array is present, each entry has `propertyId` and a boolean `available`, and that `lowestNightlyRate` is a positive number for all available properties. Response time must be under 3000ms.
+headers:
+  Authorization: Bearer {{accessToken}}
+queryParams:
+  checkIn: '2026-06-01'
+  checkOut: '2026-06-03'
+  adults: "2"
+  propertyIds: GRAND-HOTEL-LV,PALACE-HOTEL-LV,SUMMIT-HOTEL-LV
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status code is 200", function () {
+          pm.response.to.have.status(200);
+      });
+
+      pm.test("Response has checkIn", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("checkIn");
+          pm.expect(json.checkIn).to.eql("2026-06-01");
+      });
+
+      pm.test("Response has checkOut", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("checkOut");
+          pm.expect(json.checkOut).to.eql("2026-06-03");
+      });
+
+      pm.test("Response has grid array", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("grid");
+          pm.expect(json.grid).to.be.an("array");
+      });
+
+      pm.test("Each grid entry has propertyId and available fields", function () {
+          const json = pm.response.json();
+          json.grid.forEach(function(entry) {
+              pm.expect(entry).to.have.property("propertyId");
+              pm.expect(entry).to.have.property("available");
+              pm.expect(entry.available).to.be.a("boolean");
+          });
+      });
+
+      pm.test("lowestNightlyRate is positive for available properties", function () {
+          const json = pm.response.json();
+          json.grid.filter(e => e.available).forEach(function(entry) {
+              pm.expect(entry.lowestNightlyRate).to.be.a("number").and.to.be.above(0);
+          });
+      });
+
+      pm.test("Response time is under 3000ms", function () {
+          pm.expect(pm.response.responseTime).to.be.below(3000);
+      });
+    language: text/javascript
+examples: ./.resources/GET -availability-grid — Happy Path.resources/examples
+order: 8000

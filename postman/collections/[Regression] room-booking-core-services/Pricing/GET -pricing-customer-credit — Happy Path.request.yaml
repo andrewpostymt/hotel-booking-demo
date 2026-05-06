@@ -1,0 +1,66 @@
+$kind: http-request
+name: GET /pricing/customer-credit — Happy Path
+url: "{{baseUrl}}/pricing/customer-credit?propertyId=GRAND-HOTEL-LV&checkIn=2026-06-01&checkOut=2026-06-03&mlifeNumber=MLF-8823491"
+method: GET
+description: |-
+  Returns M life loyalty credit eligibility for member `MLF-8823491` at property `GRAND-HOTEL-LV` from 2026-06-01 to 2026-06-03. Tests assert `mlifeNumber` and `propertyId` echo back correctly, `creditEligible` is a boolean, the `days` array is present with `date` and non-negative `totalCredits` per entry, and `tierStatus` (if present) is one of SAPPHIRE/PEARL/GOLD/PLATINUM/NOIR. Response time must be under 3000ms.
+headers:
+  Authorization: Bearer {{accessToken}}
+queryParams:
+  propertyId: GRAND-HOTEL-LV
+  checkIn: '2026-06-01'
+  checkOut: '2026-06-03'
+  mlifeNumber: MLF-8823491
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status code is 200", function () {
+          pm.response.to.have.status(200);
+      });
+
+      pm.test("Response has mlifeNumber", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("mlifeNumber");
+          pm.expect(json.mlifeNumber).to.eql("MLF-8823491");
+      });
+
+      pm.test("Response has propertyId", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("propertyId");
+          pm.expect(json.propertyId).to.eql("GRAND-HOTEL-LV");
+      });
+
+      pm.test("Response has creditEligible boolean", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("creditEligible");
+          pm.expect(json.creditEligible).to.be.a("boolean");
+      });
+
+      pm.test("Response has days array", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("days");
+          pm.expect(json.days).to.be.an("array");
+      });
+
+      pm.test("Each day has date and credit fields", function () {
+          const json = pm.response.json();
+          json.days.forEach(function(day) {
+              pm.expect(day).to.have.property("date");
+              pm.expect(day).to.have.property("totalCredits");
+              pm.expect(day.totalCredits).to.be.a("number").and.to.be.at.least(0);
+          });
+      });
+
+      pm.test("tierStatus is a valid enum value if present", function () {
+          const json = pm.response.json();
+          if (json.tierStatus) {
+              pm.expect(["SAPPHIRE", "PEARL", "GOLD", "PLATINUM", "NOIR"]).to.include(json.tierStatus);
+          }
+      });
+
+      pm.test("Response time is under 3000ms", function () {
+          pm.expect(pm.response.responseTime).to.be.below(3000);
+      });
+    language: text/javascript
+examples: ./.resources/GET -pricing-customer-credit — Happy Path.resources/examples
+order: 1000

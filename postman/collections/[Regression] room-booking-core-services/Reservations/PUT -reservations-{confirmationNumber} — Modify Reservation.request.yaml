@@ -1,0 +1,57 @@
+$kind: http-request
+name: PUT /reservations/{confirmationNumber} — Modify Reservation
+url: "{{baseUrl}}/reservations/{{confirmationNumber}}"
+method: PUT
+description: |-
+  Modifies the reservation identified by `{{confirmationNumber}}` (set by the Create Reservation request), updating dates to 2026-06-02 → 2026-06-04, upgrading the room type to STRIP-VIEW-SUITE, and adding a child guest. Tests assert `confirmationNumber` is present, `status` is CONFIRMED or MODIFIED, `modifiedAt` is a valid ISO 8601 timestamp, and `totalDue` is a positive number reflecting the updated booking. Response time must be under 5000ms.
+headers:
+  Authorization: Bearer {{accessToken}}
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "checkIn": "2026-06-02",
+      "checkOut": "2026-06-04",
+      "roomTypeCode": "STRIP-VIEW-SUITE",
+      "guests": {
+        "adults": 2,
+        "children": 1
+      }
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status code is 200", function () {
+          pm.response.to.have.status(200);
+      });
+
+      pm.test("Response has confirmationNumber", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("confirmationNumber");
+      });
+
+      pm.test("Status is MODIFIED or CONFIRMED", function () {
+          const json = pm.response.json();
+          pm.expect(["CONFIRMED", "MODIFIED"]).to.include(json.status);
+      });
+
+      pm.test("Response has modifiedAt timestamp", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("modifiedAt");
+          const date = new Date(json.modifiedAt);
+          pm.expect(date.toString()).to.not.eql("Invalid Date");
+      });
+
+      pm.test("Response has updated totalDue", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("totalDue");
+          pm.expect(json.totalDue).to.be.a("number").and.to.be.above(0);
+      });
+
+      pm.test("Response time is under 5000ms", function () {
+          pm.expect(pm.response.responseTime).to.be.below(5000);
+      });
+    language: text/javascript
+examples: ./.resources/PUT -reservations-{confirmationNumber} — Modify Reservation.resources/examples
+order: 6000

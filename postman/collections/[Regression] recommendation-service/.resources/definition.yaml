@@ -1,0 +1,15 @@
+$kind: collection
+scripts:
+  - type: http:beforeRequest
+    code: |-
+      // Set base URL from environment or use default
+      if (!pm.environment.get("baseUrl")) {
+          pm.environment.set("baseUrl", "https://recommendation-dev.example-hospitality.com");
+      }
+    language: text/javascript
+  - type: http:afterResponse
+    code: |-
+      // Log request/response for debugging
+      console.log("Request:", pm.request.method, pm.request.url.toString());
+      console.log("Response Status:", pm.response.code);
+    language: text/javascript

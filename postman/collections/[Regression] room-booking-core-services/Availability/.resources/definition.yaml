@@ -1,0 +1,9 @@
+$kind: collection
+description: |-
+  Regression scenarios for the three availability endpoints: `/availability/calendar`, `/availability/grid`, and `/availability/trip`. Covers happy-path responses, optional filter parameters (rate plan code, room type code), and error cases for invalid date ranges (400) and missing authentication (401). All requests require `Authorization: Bearer {{accessToken}}` and target `{{baseUrl}}`.
+
+  **Endpoints covered:**
+  - `GET /availability/calendar` — Daily availability calendar for a single property
+  - `GET /availability/grid` — Cross-property availability comparison grid
+  - `GET /availability/trip` — Detailed room-level availability for a specific trip
+order: 2000

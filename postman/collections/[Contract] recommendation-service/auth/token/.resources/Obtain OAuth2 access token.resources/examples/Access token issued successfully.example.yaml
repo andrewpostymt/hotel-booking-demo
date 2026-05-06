@@ -1,0 +1,64 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/auth/token"
+  method: POST
+  headers:
+    - key: Content-Type
+      value: application/x-www-form-urlencoded
+    - key: Accept
+      value: application/json
+    - key: Authorization
+      value: <token>
+      description: "Added as a part of security scheme: oauth2"
+  body:
+    type: urlencoded
+    content:
+      - key: grant_type
+        value: client_credentials
+        description: OAuth2 grant type — must be client_credentials
+      - key: client_id
+        value: string
+        description: Registered client application identifier
+      - key: client_secret
+        value: string
+        description: Client application secret
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: text
+    content: |-
+      {
+        "access_token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJyZWNvbW1lbmRhdGlvbi1zdmMtY2xpZW50IiwiaWF0IjoxNzE0NjAwMDAwfQ.signature",
+        "token_type": "Bearer",
+        "expires_in": 3600
+      }
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "access_token": {
+            "type": "string",
+            "description": "JWT bearer token for authenticating API requests"
+          },
+          "token_type": {
+            "type": "string",
+            "enum": [
+              "Bearer"
+            ]
+          },
+          "expires_in": {
+            "type": "integer",
+            "example": 3600,
+            "description": "Token lifetime in seconds"
+          }
+        },
+        "required": [
+          "access_token",
+          "token_type",
+          "expires_in"
+        ]
+      }
+order: 1000

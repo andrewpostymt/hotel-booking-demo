@@ -1,0 +1,38 @@
+$kind: http-request
+name: GET /recommendations — Shows Only Filter
+url: "{{baseUrl}}/recommendations?orderId=ORD-2026-00198432&showsOnly=true&propertyCode=GRAND_HOTEL"
+method: GET
+headers:
+  Authorization: Bearer {{accessToken}}
+queryParams:
+  orderId: ORD-2026-00198432
+  showsOnly: "true"
+  propertyCode: GRAND_HOTEL
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status code is 200", function () {
+          pm.response.to.have.status(200);
+      });
+
+      pm.test("All recommendations are entertainment type when showsOnly=true", function () {
+          const json = pm.response.json();
+          json.recommendations.forEach(function(rec) {
+              pm.expect(rec.offerType).to.eql("entertainment");
+          });
+      });
+
+      pm.test("Response has required fields", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("orderId");
+          pm.expect(json).to.have.property("recommendations");
+          pm.expect(json).to.have.property("generatedAt");
+          pm.expect(json).to.have.property("totalCount");
+      });
+
+      pm.test("Response time is under 3000ms", function () {
+          pm.expect(pm.response.responseTime).to.be.below(3000);
+      });
+    language: text/javascript
+examples: ./.resources/GET -recommendations — Shows Only Filter.resources/examples
+order: 2000

@@ -1,0 +1,67 @@
+$kind: collection
+description: |-
+  # [Regression] room-booking-core-services
+
+  **Owner**: Room Booking Services Team (api-team@example-hospitality.com | #booking-platform-eng)
+  **Status**: Stable
+  **Last Updated**: 2026-05-05
+
+  ## Purpose
+  Core API services for the hotel room booking platform. Used by front-end booking flows, internal platform services, and CI/CD pipelines to validate availability, pricing, reservations, and cross-sell recommendations across all property environments. This regression collection covers the full suite of happy-path and error-path scenarios across all four service domains.
+
+  ## Quick Start
+  1. Select the appropriate environment (dev → nonprod-preprod)
+  2. Authenticate using OAuth2 client credentials — set `accessToken` in your environment or use the token folder to resolve credentials
+  3. Run the Health check to verify connectivity
+  4. Execute the full collection run to validate all regression scenarios end-to-end
+
+  ## Authentication
+  **Type**: OAuth 2.0 Client Credentials
+  Credentials are resolved from AWS Secrets Manager (`api-credentials-{env}`) at runtime. In CI, the `CI=true` environment variable bypasses the secrets fetch and uses the mock server directly. All requests use `Authorization: Bearer {{accessToken}}`.
+
+  ## Endpoints Overview
+  | Method | Endpoint | Description |
+  |--------|----------|-------------|
+  | GET | `/health` | Service health check — status, version, uptime, dependencies |
+  | GET | `/availability/calendar` | Daily availability calendar for a property and date range |
+  | GET | `/availability/calendar` | Invalid date range — expects 400 |
+  | GET | `/availability/calendar` | Unauthorized — expects 401 |
+  | GET | `/availability/calendar` | Filtered by rate plan code |
+  | GET | `/availability/grid` | Multi-property availability grid |
+  | GET | `/availability/grid` | Invalid date range — expects 400 |
+  | GET | `/availability/trip` | Detailed room availability for a trip |
+  | GET | `/availability/trip` | Invalid date range — expects 400 |
+  | GET | `/availability/trip` | Filtered by room type code |
+  | GET | `/pricing/customer-credit` | Loyalty member credit eligibility and daily amounts |
+  | GET | `/pricing/customer-credit` | Member not found — expects 404 |
+  | GET | `/pricing/rate-plans` | Available rate plans for a property |
+  | GET | `/pricing/rate-plans` | Filtered by customer segment |
+  | POST | `/pricing/room-charges` | Full pricing breakdown with add-ons |
+  | POST | `/pricing/room-charges` | Missing required fields — expects 400 |
+  | POST | `/reservations` | Create a new reservation |
+  | POST | `/reservations` | Missing payment — expects 400 |
+  | POST | `/reservations` | Unauthorized — expects 401 |
+  | GET | `/reservations/{confirmationNumber}` | Retrieve reservation by confirmation number |
+  | GET | `/reservations/{confirmationNumber}` | Not found — expects 404 |
+  | PUT | `/reservations/{confirmationNumber}` | Modify an existing reservation |
+  | PUT | `/reservations/{confirmationNumber}` | Not found — expects 404 |
+  | DELETE | `/reservations/{confirmationNumber}` | Cancel a reservation |
+  | DELETE | `/reservations/{confirmationNumber}` | Not found — expects 404 |
+
+  ## Lifecycle
+  **Stable** — Production-ready, follows semantic versioning. Breaking changes announced via workspace updates with 30 days notice.
+
+  ## Support
+  Questions? Contact Room Booking Services Team at api-team@example-hospitality.com or #booking-platform-eng.
+scripts:
+  - type: http:beforeRequest
+    code: |-
+      if (!pm.environment.get("baseUrl")) {
+          pm.environment.set("baseUrl", "https://dev-api.example-hospitality.com/room-booking/v3");
+      }
+    language: text/javascript
+  - type: http:afterResponse
+    code: |-
+      console.log("Request:", pm.request.method, pm.request.url.toString());
+      console.log("Response Status:", pm.response.code);
+    language: text/javascript

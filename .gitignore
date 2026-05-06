@@ -5,3 +5,7 @@ postman-repo-sync-result.json
 
 # CI test result artifacts
 results/
+
+# Docs action runtime output
+postman-docs-result.json
+report.html

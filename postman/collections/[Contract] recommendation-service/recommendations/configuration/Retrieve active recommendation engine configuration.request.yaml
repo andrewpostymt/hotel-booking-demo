@@ -1,0 +1,312 @@
+$kind: http-request
+description: |
+  Returns the current configuration state of the recommendation engine,
+  including active offer weightings, blackout dates, and property-level
+  override flags. Used by the platform team for live configuration inspection.
+url: "{{baseUrl}}/recommendations/configuration"
+method: GET
+headers:
+  Accept: application/json
+scripts:
+  - type: afterResponse
+    code: |-
+      var contract = JSON.parse("{\"method\":\"GET\",\"path\":\"/recommendations/configuration\",\"responses\":{\"200\":{\"content\":{\"application/json\":{\"schema\":{\"type\":\"object\",\"required\":[\"configVersion\",\"lastUpdatedAt\",\"offerWeights\"],\"properties\":{\"configVersion\":{\"type\":\"string\"},\"lastUpdatedBy\":{\"type\":\"string\"},\"lastUpdatedAt\":{\"type\":\"string\"},\"offerWeights\":{\"type\":\"object\",\"properties\":{\"entertainment\":{\"type\":\"number\",\"minimum\":0,\"maximum\":1},\"dining\":{\"type\":\"number\",\"minimum\":0,\"maximum\":1},\"resort_package\":{\"type\":\"number\",\"minimum\":0,\"maximum\":1}}},\"blackoutDates\":{\"type\":\"array\",\"items\":{\"type\":\"string\"}},\"propertyOverrides\":{\"type\":\"object\",\"additionalProperties\":{\"type\":\"object\",\"properties\":{\"showsOnlyEnabled\":{\"type\":\"boolean\"}}}}},\"$schema\":\"https://json-schema.org/draft/2020-12/schema\"}}},\"hasBody\":true,\"headers\":[]},\"401\":{\"content\":{\"application/json\":{\"schema\":{\"type\":\"object\",\"required\":[\"code\",\"message\"],\"properties\":{\"code\":{\"type\":\"string\"},\"message\":{\"type\":\"string\"},\"detail\":{\"type\":\"string\"},\"traceId\":{\"type\":\"string\"}},\"$schema\":\"https://json-schema.org/draft/2020-12/schema\"}}},\"hasBody\":true,\"headers\":[]}}}");
+      var validators = {};
+      validators["200"] = validators["200"] || {};
+      validators["200"]["application/json"] = (function() {
+      'use strict'
+      const hasOwn = Function.prototype.call.bind(Object.prototype.hasOwnProperty);
+      const pointerPart = (s) => /~\//.test(s) ? `${s}`.replace(/~/g, "~0").replace(/\//g, "~1") : s;
+      const ref0 = function validate(data) {
+        validate.errors = null
+        let errorCount = 0
+        if (!(typeof data === "object" && data && !Array.isArray(data))) {
+          if (validate.errors === null) validate.errors = []
+          validate.errors.push({ keywordLocation: "#/type", instanceLocation: "#" })
+          errorCount++
+        }
+        else {
+          if (!(data.configVersion !== undefined && hasOwn(data, "configVersion"))) {
+            if (validate.errors === null) validate.errors = []
+            validate.errors.push({ keywordLocation: "#/required", instanceLocation: "#/configVersion" })
+            errorCount++
+          }
+          if (!(data.lastUpdatedAt !== undefined && hasOwn(data, "lastUpdatedAt"))) {
+            if (validate.errors === null) validate.errors = []
+            validate.errors.push({ keywordLocation: "#/required", instanceLocation: "#/lastUpdatedAt" })
+            errorCount++
+          }
+          if (!(data.offerWeights !== undefined && hasOwn(data, "offerWeights"))) {
+            if (validate.errors === null) validate.errors = []
+            validate.errors.push({ keywordLocation: "#/required", instanceLocation: "#/offerWeights" })
+            errorCount++
+          }
+          if (data.configVersion !== undefined && hasOwn(data, "configVersion")) {
+            if (!(typeof data.configVersion === "string")) {
+              if (validate.errors === null) validate.errors = []
+              validate.errors.push({ keywordLocation: "#/properties/configVersion/type", instanceLocation: "#/configVersion" })
+              errorCount++
+            }
+          }
+          if (data.lastUpdatedBy !== undefined && hasOwn(data, "lastUpdatedBy")) {
+            if (!(typeof data.lastUpdatedBy === "string")) {
+              if (validate.errors === null) validate.errors = []
+              validate.errors.push({ keywordLocation: "#/properties/lastUpdatedBy/type", instanceLocation: "#/lastUpdatedBy" })
+              errorCount++
+            }
+          }
+          if (data.lastUpdatedAt !== undefined && hasOwn(data, "lastUpdatedAt")) {
+            if (!(typeof data.lastUpdatedAt === "string")) {
+              if (validate.errors === null) validate.errors = []
+              validate.errors.push({ keywordLocation: "#/properties/lastUpdatedAt/type", instanceLocation: "#/lastUpdatedAt" })
+              errorCount++
+            }
+          }
+          if (data.offerWeights !== undefined && hasOwn(data, "offerWeights")) {
+            if (!(typeof data.offerWeights === "object" && data.offerWeights && !Array.isArray(data.offerWeights))) {
+              if (validate.errors === null) validate.errors = []
+              validate.errors.push({ keywordLocation: "#/properties/offerWeights/type", instanceLocation: "#/offerWeights" })
+              errorCount++
+            }
+            else {
+              if (data.offerWeights.entertainment !== undefined && hasOwn(data.offerWeights, "entertainment")) {
+                if (!(typeof data.offerWeights.entertainment === "number")) {
+                  if (validate.errors === null) validate.errors = []
+                  validate.errors.push({ keywordLocation: "#/properties/offerWeights/properties/entertainment/type", instanceLocation: "#/offerWeights/entertainment" })
+                  errorCount++
+                }
+                else {
+                  if (!(0 <= data.offerWeights.entertainment)) {
+                    if (validate.errors === null) validate.errors = []
+                    validate.errors.push({ keywordLocation: "#/properties/offerWeights/properties/entertainment/minimum", instanceLocation: "#/offerWeights/entertainment" })
+                    errorCount++
+                  }
+                  if (!(1 >= data.offerWeights.entertainment)) {
+                    if (validate.errors === null) validate.errors = []
+                    validate.errors.push({ keywordLocation: "#/properties/offerWeights/properties/entertainment/maximum", instanceLocation: "#/offerWeights/entertainment" })
+                    errorCount++
+                  }
+                }
+              }
+              if (data.offerWeights.dining !== undefined && hasOwn(data.offerWeights, "dining")) {
+                if (!(typeof data.offerWeights.dining === "number")) {
+                  if (validate.errors === null) validate.errors = []
+                  validate.errors.push({ keywordLocation: "#/properties/offerWeights/properties/dining/type", instanceLocation: "#/offerWeights/dining" })
+                  errorCount++
+                }
+                else {
+                  if (!(0 <= data.offerWeights.dining)) {
+                    if (validate.errors === null) validate.errors = []
+                    validate.errors.push({ keywordLocation: "#/properties/offerWeights/properties/dining/minimum", instanceLocation: "#/offerWeights/dining" })
+                    errorCount++
+                  }
+                  if (!(1 >= data.offerWeights.dining)) {
+                    if (validate.errors === null) validate.errors = []
+                    validate.errors.push({ keywordLocation: "#/properties/offerWeights/properties/dining/maximum", instanceLocation: "#/offerWeights/dining" })
+                    errorCount++
+                  }
+                }
+              }
+              if (data.offerWeights.resort_package !== undefined && hasOwn(data.offerWeights, "resort_package")) {
+                if (!(typeof data.offerWeights.resort_package === "number")) {
+                  if (validate.errors === null) validate.errors = []
+                  validate.errors.push({ keywordLocation: "#/properties/offerWeights/properties/resort_package/type", instanceLocation: "#/offerWeights/resort_package" })
+                  errorCount++
+                }
+                else {
+                  if (!(0 <= data.offerWeights.resort_package)) {
+                    if (validate.errors === null) validate.errors = []
+                    validate.errors.push({ keywordLocation: "#/properties/offerWeights/properties/resort_package/minimum", instanceLocation: "#/offerWeights/resort_package" })
+                    errorCount++
+                  }
+                  if (!(1 >= data.offerWeights.resort_package)) {
+                    if (validate.errors === null) validate.errors = []
+                    validate.errors.push({ keywordLocation: "#/properties/offerWeights/properties/resort_package/maximum", instanceLocation: "#/offerWeights/resort_package" })
+                    errorCount++
+                  }
+                }
+              }
+            }
+          }
+          if (data.blackoutDates !== undefined && hasOwn(data, "blackoutDates")) {
+            if (!Array.isArray(data.blackoutDates)) {
+              if (validate.errors === null) validate.errors = []
+              validate.errors.push({ keywordLocation: "#/properties/blackoutDates/type", instanceLocation: "#/blackoutDates" })
+              errorCount++
+            }
+            else {
+              for (let i = 0; i < data.blackoutDates.length; i++) {
+                if (data.blackoutDates[i] !== undefined && hasOwn(data.blackoutDates, i)) {
+                  if (!(typeof data.blackoutDates[i] === "string")) {
+                    if (validate.errors === null) validate.errors = []
+                    validate.errors.push({ keywordLocation: "#/properties/blackoutDates/items/type", instanceLocation: "#/blackoutDates/"+i })
+                    errorCount++
+                  }
+                }
+              }
+            }
+          }
+          if (data.propertyOverrides !== undefined && hasOwn(data, "propertyOverrides")) {
+            if (!(typeof data.propertyOverrides === "object" && data.propertyOverrides && !Array.isArray(data.propertyOverrides))) {
+              if (validate.errors === null) validate.errors = []
+              validate.errors.push({ keywordLocation: "#/properties/propertyOverrides/type", instanceLocation: "#/propertyOverrides" })
+              errorCount++
+            }
+            else {
+              for (const key0 of Object.keys(data.propertyOverrides)) {
+                if (!(typeof data.propertyOverrides[key0] === "object" && data.propertyOverrides[key0] && !Array.isArray(data.propertyOverrides[key0]))) {
+                  if (validate.errors === null) validate.errors = []
+                  validate.errors.push({ keywordLocation: "#/properties/propertyOverrides/additionalProperties/type", instanceLocation: "#/propertyOverrides/"+pointerPart(key0) })
+                  errorCount++
+                }
+                else {
+                  if (data.propertyOverrides[key0].showsOnlyEnabled !== undefined && hasOwn(data.propertyOverrides[key0], "showsOnlyEnabled")) {
+                    if (!(typeof data.propertyOverrides[key0].showsOnlyEnabled === "boolean")) {
+                      if (validate.errors === null) validate.errors = []
+                      validate.errors.push({ keywordLocation: "#/properties/propertyOverrides/additionalProperties/properties/showsOnlyEnabled/type", instanceLocation: "#/propertyOverrides/"+pointerPart(key0)+"/showsOnlyEnabled" })
+                      errorCount++
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        return errorCount === 0
+      };
+      return ref0})();;
+      validators["401"] = validators["401"] || {};
+      validators["401"]["application/json"] = (function() {
+      'use strict'
+      const hasOwn = Function.prototype.call.bind(Object.prototype.hasOwnProperty);
+      const ref0 = function validate(data) {
+        validate.errors = null
+        let errorCount = 0
+        if (!(typeof data === "object" && data && !Array.isArray(data))) {
+          if (validate.errors === null) validate.errors = []
+          validate.errors.push({ keywordLocation: "#/type", instanceLocation: "#" })
+          errorCount++
+        }
+        else {
+          if (!(data.code !== undefined && hasOwn(data, "code"))) {
+            if (validate.errors === null) validate.errors = []
+            validate.errors.push({ keywordLocation: "#/required", instanceLocation: "#/code" })
+            errorCount++
+          }
+          if (!(data.message !== undefined && hasOwn(data, "message"))) {
+            if (validate.errors === null) validate.errors = []
+            validate.errors.push({ keywordLocation: "#/required", instanceLocation: "#/message" })
+            errorCount++
+          }
+          if (data.code !== undefined && hasOwn(data, "code")) {
+            if (!(typeof data.code === "string")) {
+              if (validate.errors === null) validate.errors = []
+              validate.errors.push({ keywordLocation: "#/properties/code/type", instanceLocation: "#/code" })
+              errorCount++
+            }
+          }
+          if (data.message !== undefined && hasOwn(data, "message")) {
+            if (!(typeof data.message === "string")) {
+              if (validate.errors === null) validate.errors = []
+              validate.errors.push({ keywordLocation: "#/properties/message/type", instanceLocation: "#/message" })
+              errorCount++
+            }
+          }
+          if (data.detail !== undefined && hasOwn(data, "detail")) {
+            if (!(typeof data.detail === "string")) {
+              if (validate.errors === null) validate.errors = []
+              validate.errors.push({ keywordLocation: "#/properties/detail/type", instanceLocation: "#/detail" })
+              errorCount++
+            }
+          }
+          if (data.traceId !== undefined && hasOwn(data, "traceId")) {
+            if (!(typeof data.traceId === "string")) {
+              if (validate.errors === null) validate.errors = []
+              validate.errors.push({ keywordLocation: "#/properties/traceId/type", instanceLocation: "#/traceId" })
+              errorCount++
+            }
+          }
+        }
+        return errorCount === 0
+      };
+      return ref0})();;
+      function selectedResponseContract() {
+        var status = String(pm.response.code);
+        if (contract.responses[status]) return { key: status, value: contract.responses[status] };
+        var range = String(Math.floor(pm.response.code / 100)) + 'XX';
+        if (contract.responses[range]) return { key: range, value: contract.responses[range] };
+        if (contract.responses.default) return { key: 'default', value: contract.responses.default };
+        return null;
+      }
+      function responseText() { return pm.response.text() || ""; }
+      function isBodyless() { return pm.response.code === 204 || pm.response.code === 205 || pm.response.code === 304 || contract.method === "HEAD"; }
+      function mediaBase(value) { return String(value || "").toLowerCase().split(";")[0].trim(); }
+      function mediaParts(value) { var base = mediaBase(value); var parts = base.split("/"); return { raw: base, type: parts[0] || "", subtype: parts[1] || "" }; }
+      function isJsonSubtype(subtype) { return subtype === "json" || /\+json$/.test(subtype); }
+      function mediaScore(expected, actual) {
+        var e = mediaParts(expected); var a = mediaParts(actual);
+        if (!e.raw || !a.raw) return 0;
+        if (e.raw === a.raw) return 4;
+        if (e.type === a.type && e.subtype === "json" && isJsonSubtype(a.subtype)) return 3;
+        if (e.type === a.type && e.subtype === "*+json" && /\+json$/.test(a.subtype)) return 3;
+        if (e.type === a.type && e.subtype === "*") return 2;
+        if (e.type === "*" && e.subtype === "*") return 1;
+        return 0;
+      }
+      function selectMedia(responseContract) {
+        var actual = pm.response.headers.get("Content-Type") || "";
+        var content = responseContract.content || {};
+        var matches = Object.keys(content).map(function (expected) { return { expected: expected, score: mediaScore(expected, actual), media: content[expected] }; }).filter(function (entry) { return entry.score > 0; }).sort(function (a, b) { return b.score - a.score; });
+        if (matches.length === 0) return { error: "Content-Type " + actual + " does not match OpenAPI content for " + contract.method + " " + contract.path + " status " + pm.response.code + "; expected " + Object.keys(content).join(", ") };
+        if (matches.length > 1 && matches[0].score === matches[1].score) return { error: "Content-Type " + actual + " ambiguously matches OpenAPI content for " + contract.method + " " + contract.path + " status " + pm.response.code + "; expected " + Object.keys(content).join(", ") };
+        return matches[0];
+      }
+      var selected = selectedResponseContract();
+      pm.test('OpenAPI operation mapping exists', function () { pm.expect(contract.path).to.be.a('string').and.not.empty; });
+      pm.test('Status code is defined by OpenAPI', function () { pm.expect(selected, 'No OpenAPI response defined for ' + contract.method + ' ' + contract.path + ' status ' + pm.response.code).to.exist; });
+      pm.test('Response headers match OpenAPI', function () {
+        if (!selected) return;
+        var headers = selected.value.headers || [];
+        headers.forEach(function (header) {
+          var actual = pm.response.headers.get(header.name);
+          if (!actual && header.required) pm.expect.fail("OpenAPI response header missing for " + contract.method + " " + contract.path + ": " + header.name);
+          if (!actual) return;
+          if (header.unsupported) pm.expect.fail("OpenAPI response header unsupported for " + contract.method + " " + contract.path + ": " + header.unsupported);
+          var headerValidator = validators[selected.key] && validators[selected.key].__headers && validators[selected.key].__headers[String(header.name).toLowerCase()];
+          if (headerValidator && !headerValidator(actual)) pm.expect.fail("OpenAPI response header validation failed for " + header.name + ": " + JSON.stringify(headerValidator.errors || []));
+        });
+      });
+      pm.test('Response body matches OpenAPI body contract', function () {
+        if (!selected) return;
+        if (isBodyless()) { pm.expect(responseText().trim().length).to.equal(0); return; }
+        var content = selected.value.content || {};
+        if (Object.keys(content).length === 0) { pm.expect(responseText().trim().length, "OpenAPI response defines no body but response body was not empty").to.equal(0); }
+        else { pm.expect(responseText().trim().length, "OpenAPI response defines a body but response body was empty").to.be.above(0); }
+      });
+      pm.test('Content-Type matches OpenAPI response content', function () {
+        if (!selected || isBodyless()) return;
+        var content = selected.value.content || {};
+        if (Object.keys(content).length === 0) return;
+        var actual = pm.response.headers.get("Content-Type");
+        if (!actual) pm.expect.fail("Content-Type <missing> does not match OpenAPI content for " + contract.method + " " + contract.path + " status " + pm.response.code + "; expected " + Object.keys(content).join(", "));
+        var media = selectMedia(selected.value);
+        if (media.error) pm.expect.fail(media.error);
+      });
+      pm.test('Response body matches OpenAPI schema', function () {
+        if (!selected || isBodyless()) return;
+        var content = selected.value.content || {};
+        if (Object.keys(content).length === 0) return;
+        var media = selectMedia(selected.value);
+        if (media.error) return;
+        if (media.media.unsupported) pm.expect.fail("OpenAPI schema unsupported for " + contract.method + " " + contract.path + " status " + pm.response.code + ": " + media.media.unsupported);
+        if (!media.media.schema) { return; }
+        var validate = validators[selected.key] && validators[selected.key][media.expected];
+        if (!validate) pm.expect.fail("OpenAPI schema validator was not generated for " + media.expected);
+        var actual = mediaParts(pm.response.headers.get("Content-Type") || "");
+        var value = isJsonSubtype(actual.subtype) ? pm.response.json() : responseText();
+        if (!isJsonSubtype(actual.subtype) && media.media.schema && media.media.schema.type !== "string") pm.expect.fail("Non-JSON response schema validation unsupported for " + contract.method + " " + contract.path);
+        if (!validate(value)) pm.expect.fail("OpenAPI schema validation failed for " + contract.method + " " + contract.path + " status " + pm.response.code + ": " + JSON.stringify(validate.errors || []));
+      });
+    language: text/javascript
+examples: ./.resources/Retrieve active recommendation engine configuration.resources/examples
+order: 1000

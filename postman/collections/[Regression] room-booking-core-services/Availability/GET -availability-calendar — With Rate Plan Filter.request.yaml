@@ -1,0 +1,34 @@
+$kind: http-request
+name: GET /availability/calendar — With Rate Plan Filter
+url: "{{baseUrl}}/availability/calendar?propertyId=GRAND-HOTEL-LV&checkIn=2026-06-01&checkOut=2026-06-03&adults=2&ratePlanCode=FLEX_RACK"
+method: GET
+description: |-
+  Extends the happy-path calendar request by adding the optional `ratePlanCode=FLEX_RACK` query parameter. Verifies that the API accepts the filter without error and returns a valid response containing `propertyId`, `currency`, and `days`. Useful for confirming that rate-plan-specific availability filtering is supported. Response time must be under 3000ms.
+headers:
+  Authorization: Bearer {{accessToken}}
+queryParams:
+  propertyId: GRAND-HOTEL-LV
+  checkIn: '2026-06-01'
+  checkOut: '2026-06-03'
+  adults: "2"
+  ratePlanCode: FLEX_RACK
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status code is 200", function () {
+          pm.response.to.have.status(200);
+      });
+
+      pm.test("Response structure is valid", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("propertyId");
+          pm.expect(json).to.have.property("currency");
+          pm.expect(json).to.have.property("days");
+      });
+
+      pm.test("Response time is under 3000ms", function () {
+          pm.expect(pm.response.responseTime).to.be.below(3000);
+      });
+    language: text/javascript
+examples: ./.resources/GET -availability-calendar — With Rate Plan Filter.resources/examples
+order: 2000

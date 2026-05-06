@@ -1,0 +1,90 @@
+$kind: http-request
+name: POST /pricing/room-charges — Happy Path
+url: "{{baseUrl}}/pricing/room-charges"
+method: POST
+description: |-
+  Calculates a full pricing breakdown for a 2-night DELUXE-KING stay at GRAND-HOTEL-LV on the FLEX_RACK rate plan, including RESORT-FEE and EARLY-CHECKIN add-ons. Tests assert `propertyId` and `roomTypeCode` echo back, `nights` equals 2, `lineItems` is a non-empty array, `subtotal`, `taxAmount`, and `totalDue` are all present and non-negative, `totalDue` equals `subtotal + taxAmount` (rounded to 2 decimal places), and `currency` is a non-empty string. Response time must be under 3000ms.
+headers:
+  Authorization: Bearer {{accessToken}}
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "propertyId": "GRAND-HOTEL-LV",
+      "roomTypeCode": "DELUXE-KING",
+      "ratePlanCode": "FLEX_RACK",
+      "checkIn": "2026-06-01",
+      "checkOut": "2026-06-03",
+      "guests": {
+        "adults": 2,
+        "children": 0
+      },
+      "addOns": [
+        { "code": "RESORT-FEE" },
+        { "code": "EARLY-CHECKIN" }
+      ]
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status code is 200", function () {
+          pm.response.to.have.status(200);
+      });
+
+      pm.test("Response has propertyId", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("propertyId");
+          pm.expect(json.propertyId).to.eql("GRAND-HOTEL-LV");
+      });
+
+      pm.test("Response has roomTypeCode", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("roomTypeCode");
+          pm.expect(json.roomTypeCode).to.eql("DELUXE-KING");
+      });
+
+      pm.test("Response has nights field", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("nights");
+          pm.expect(json.nights).to.eql(2);
+      });
+
+      pm.test("Response has lineItems array", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("lineItems");
+          pm.expect(json.lineItems).to.be.an("array").and.not.empty;
+      });
+
+      pm.test("Response has subtotal, taxAmount, totalDue", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("subtotal");
+          pm.expect(json).to.have.property("taxAmount");
+          pm.expect(json).to.have.property("totalDue");
+      });
+
+      pm.test("totalDue equals subtotal + taxAmount", function () {
+          const json = pm.response.json();
+          const expected = Math.round((json.subtotal + json.taxAmount) * 100) / 100;
+          pm.expect(Math.round(json.totalDue * 100) / 100).to.eql(expected);
+      });
+
+      pm.test("Response has currency", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("currency");
+          pm.expect(json.currency).to.be.a("string").and.not.empty;
+      });
+
+      pm.test("All amounts are non-negative", function () {
+          const json = pm.response.json();
+          pm.expect(json.subtotal).to.be.at.least(0);
+          pm.expect(json.taxAmount).to.be.at.least(0);
+          pm.expect(json.totalDue).to.be.at.least(0);
+      });
+
+      pm.test("Response time is under 3000ms", function () {
+          pm.expect(pm.response.responseTime).to.be.below(3000);
+      });
+    language: text/javascript
+examples: ./.resources/POST -pricing-room-charges — Happy Path.resources/examples
+order: 5000

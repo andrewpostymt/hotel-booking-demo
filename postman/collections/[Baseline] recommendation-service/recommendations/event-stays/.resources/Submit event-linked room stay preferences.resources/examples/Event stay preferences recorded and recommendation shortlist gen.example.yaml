@@ -1,0 +1,83 @@
+$kind: http-example
+name: Event stay preferences recorded and recommendation shortlist generated
+request:
+  url: "{{baseUrl}}/recommendations/event-stays"
+  method: POST
+  headers:
+    - key: Content-Type
+      value: application/json
+    - key: Accept
+      value: application/json
+    - key: Authorization
+      value: <token>
+      description: "Added as a part of security scheme: oauth2"
+  body:
+    type: json
+    content: |-
+      {
+        "eventId": "EVT-BM-DOLBY-2026",
+        "eventName": "Bruno Mars at Dolby Live",
+        "propertyCode": "ARIA",
+        "preferredCheckIn": "2026-05-15",
+        "preferredCheckOut": "2026-05-17",
+        "roomCount": 1,
+        "guestCount": 2,
+        "orderId": null
+      }
+response:
+  statusCode: 201
+  statusText: Created
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "preferenceId": "PREF-2026-00087432",
+        "eventId": "EVT-BM-DOLBY-2026",
+        "status": "queued",
+        "estimatedOfferCount": 4,
+        "redirectUrl": "https://www.example-hospitality.com/booking/room?prefId=PREF-2026-00087432"
+      }
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "preferenceId": {
+            "type": "string",
+            "example": "PREF-2026-00087432",
+            "description": "Unique identifier for the submitted preference record"
+          },
+          "eventId": {
+            "type": "string",
+            "example": "EVT-BM-DOLBY-2026",
+            "description": "Event this preference is associated with"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "queued",
+              "processing",
+              "completed",
+              "expired"
+            ],
+            "description": "Current processing status of the preference submission"
+          },
+          "estimatedOfferCount": {
+            "type": "integer",
+            "example": 4,
+            "description": "Estimated number of room offers that will be surfaced"
+          },
+          "redirectUrl": {
+            "type": "string",
+            "description": "Deep link to the booking flow pre-populated with these preferences",
+            "format": "uri"
+          }
+        },
+        "required": [
+          "preferenceId",
+          "eventId",
+          "status"
+        ]
+      }
+order: 1000

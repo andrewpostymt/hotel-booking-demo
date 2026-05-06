@@ -1,0 +1,97 @@
+$kind: http-request
+name: POST /reservations — Create Reservation Happy Path
+url: "{{baseUrl}}/reservations"
+method: POST
+description: |-
+  Creates a new reservation for a 2-night DELUXE-KING stay at GRAND-HOTEL-LV (2026-06-01 to 2026-06-03) for primary guest Jane Smith with M life number MLF-8823491, paid by credit card token `tok_visa_4242`, with RESORT-FEE add-on. On a 201 response, stores `confirmationNumber` in the environment for use by subsequent retrieve, modify, and cancel requests. Tests assert status is CONFIRMED, `propertyId` and `roomTypeCode` echo back, `checkIn`/`checkOut` are correct, `totalDue` is a positive number, and `createdAt` is a valid ISO 8601 timestamp. Response time must be under 5000ms.
+headers:
+  Authorization: Bearer {{accessToken}}
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "propertyId": "GRAND-HOTEL-LV",
+      "roomTypeCode": "DELUXE-KING",
+      "ratePlanCode": "FLEX_RACK",
+      "checkIn": "2026-06-01",
+      "checkOut": "2026-06-03",
+      "guests": {
+        "adults": 2,
+        "children": 0,
+        "primary": {
+          "firstName": "Jane",
+          "lastName": "Smith",
+          "email": "jane.smith@example.com",
+          "phone": "+17025550100",
+          "mlifeNumber": "MLF-8823491"
+        }
+      },
+      "payment": {
+        "type": "CREDIT_CARD",
+        "token": "tok_visa_4242"
+      },
+      "addOns": [
+        { "code": "RESORT-FEE" }
+      ]
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status code is 201", function () {
+          pm.response.to.have.status(201);
+      });
+
+      pm.test("Response has confirmationNumber", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("confirmationNumber");
+          pm.expect(json.confirmationNumber).to.be.a("string").and.not.empty;
+      });
+
+      pm.test("Status is CONFIRMED", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("status");
+          pm.expect(json.status).to.eql("CONFIRMED");
+      });
+
+      pm.test("Response has propertyId matching request", function () {
+          const json = pm.response.json();
+          pm.expect(json.propertyId).to.eql("GRAND-HOTEL-LV");
+      });
+
+      pm.test("Response has roomTypeCode matching request", function () {
+          const json = pm.response.json();
+          pm.expect(json.roomTypeCode).to.eql("DELUXE-KING");
+      });
+
+      pm.test("Response has checkIn and checkOut", function () {
+          const json = pm.response.json();
+          pm.expect(json.checkIn).to.eql("2026-06-01");
+          pm.expect(json.checkOut).to.eql("2026-06-03");
+      });
+
+      pm.test("Response has totalDue as positive number", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("totalDue");
+          pm.expect(json.totalDue).to.be.a("number").and.to.be.above(0);
+      });
+
+      pm.test("Response has createdAt timestamp", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("createdAt");
+          const date = new Date(json.createdAt);
+          pm.expect(date.toString()).to.not.eql("Invalid Date");
+      });
+
+      pm.test("Response time is under 5000ms", function () {
+          pm.expect(pm.response.responseTime).to.be.below(5000);
+      });
+
+      // Store confirmation number for subsequent tests
+      if (pm.response.code === 201) {
+          const json = pm.response.json();
+          pm.environment.set("confirmationNumber", json.confirmationNumber);
+      }
+    language: text/javascript
+examples: ./.resources/POST -reservations — Create Reservation Happy Path.resources/examples
+order: 1000

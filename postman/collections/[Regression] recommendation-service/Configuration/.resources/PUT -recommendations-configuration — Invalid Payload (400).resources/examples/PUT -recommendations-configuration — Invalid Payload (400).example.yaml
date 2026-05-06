@@ -1,0 +1,20 @@
+$kind: http-example
+name: PUT /recommendations/configuration — Invalid Payload (400)
+request:
+  url: "{{baseUrl}}/recommendations/configuration"
+  method: PUT
+  body:
+    type: json
+    content: |-
+      {
+        "offerWeights": {
+          "entertainment": 5.0
+        }
+      }
+response:
+  statusCode: 400
+  statusText: Bad Request
+  body:
+    type: json
+    content: '{"code": "VALIDATION_ERROR", "message": "Request body validation failed.", "details": [{"field": "weights.roomScore", "issue": "Value must be a number between 0 and 1."}, {"field": "weights", "issue": "All weight values must sum to 1.0."}]}'
+order: 1000

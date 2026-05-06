@@ -1,0 +1,44 @@
+$kind: http-request
+description: |
+  Issues an OAuth2 client credentials access token for authenticating
+  subsequent recommendation service requests. Token lifetime is 3600 seconds.
+url: "{{baseUrl}}/auth/token"
+method: POST
+headers:
+  Content-Type: application/x-www-form-urlencoded
+  Accept: application/json
+body:
+  type: urlencoded
+  content:
+    - key: grant_type
+      value: client_credentials
+      description: OAuth2 grant type — must be client_credentials
+    - key: client_id
+      value: string
+      description: Registered client application identifier
+    - key: client_secret
+      value: string
+      description: Client application secret
+scripts:
+  - type: afterResponse
+    code: |-
+      // [Smoke] Auto-generated test assertions
+
+      pm.test('Status code is successful (2xx)', function () {
+          pm.response.to.be.success;
+      });
+
+      pm.test('Response time is acceptable', function () {
+          var threshold = parseInt(pm.environment.get('RESPONSE_TIME_THRESHOLD') || '2000', 10);
+          pm.expect(pm.response.responseTime).to.be.below(threshold);
+      });
+
+      pm.test('Response body is not empty', function () {
+          if (pm.response.code !== 204) {
+              var body = pm.response.text();
+              pm.expect(body.length).to.be.above(0);
+          }
+      });
+    language: text/javascript
+examples: ./.resources/Obtain OAuth2 access token.resources/examples
+order: 1000

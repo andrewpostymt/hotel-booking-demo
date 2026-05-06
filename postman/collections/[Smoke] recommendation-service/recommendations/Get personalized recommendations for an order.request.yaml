@@ -1,0 +1,117 @@
+$kind: http-request
+description: |
+  Returns a ranked list of cross-sell and upsell offers for a given order context.
+  Recommendations are personalized based on the guest's order history, stay parameters,
+  and property-level availability. Set `showsOnly=true` to filter to entertainment
+  offers exclusively (used in the post-booking shows upsell flow).
+
+  The `stayNights` parameter drives offer selection logic:
+  - `stayNights=1`: single-night offers, show add-ons, dining
+  - `stayNights=3`: multi-night packages, resort credits, extended stay incentives
+url: "{{baseUrl}}/recommendations?orderId=ORD-2026-00124857&roomCount=1&stayNights=3&showsOnly=false&propertyCode=ARIA"
+method: GET
+headers:
+  Accept: application/json
+queryParams:
+  - key: orderId
+    value: ORD-2026-00124857
+    description: Unique identifier of the confirmed booking order
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "example": "ORD-2026-00124857"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+  - key: roomCount
+    value: "1"
+    description: Number of rooms in the order — influences bundle sizing for recommendations
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "integer",
+            "default": 1,
+            "minimum": 1,
+            "maximum": 10,
+            "example": 1
+          }
+        }
+      }
+  - key: stayNights
+    value: "3"
+    description: Length of stay in nights — drives offer selection logic
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "integer",
+            "default": 1,
+            "enum": [
+              1,
+              3
+            ],
+            "example": 3
+          }
+        }
+      }
+  - key: showsOnly
+    value: "false"
+    description: |
+      When true, filters recommendations to entertainment and show offers only.
+      Used in the post-booking upsell flow for guests who have not added show tickets.
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "boolean",
+            "default": false,
+            "example": false
+          }
+        }
+      }
+  - key: propertyCode
+    value: ARIA
+    description: Hotel property code to scope recommendations to a specific property
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "example": "ARIA"
+          }
+        }
+      }
+scripts:
+  - type: afterResponse
+    code: |-
+      // [Smoke] Auto-generated test assertions
+
+      pm.test('Status code is successful (2xx)', function () {
+          pm.response.to.be.success;
+      });
+
+      pm.test('Response time is acceptable', function () {
+          var threshold = parseInt(pm.environment.get('RESPONSE_TIME_THRESHOLD') || '2000', 10);
+          pm.expect(pm.response.responseTime).to.be.below(threshold);
+      });
+
+      pm.test('Response body is not empty', function () {
+          if (pm.response.code !== 204) {
+              var body = pm.response.text();
+              pm.expect(body.length).to.be.above(0);
+          }
+      });
+    language: text/javascript
+examples: ./.resources/Get personalized recommendations for an order.resources/examples
+order: 3000

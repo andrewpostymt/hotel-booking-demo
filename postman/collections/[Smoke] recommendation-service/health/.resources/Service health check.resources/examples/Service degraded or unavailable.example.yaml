@@ -1,0 +1,61 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/health"
+  method: GET
+  headers:
+    - key: Accept
+      value: application/json
+    - key: Authorization
+      value: <token>
+      description: "Added as a part of security scheme: oauth2"
+response:
+  statusCode: 503
+  statusText: Service Unavailable
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "status": "healthy",
+        "timestamp": "1963-02-23T20:07:41.673Z",
+        "version": "1.4.2",
+        "dependencies": {
+          "key_0": "healthy",
+          "key_1": "degraded"
+        }
+      }
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "healthy",
+              "degraded",
+              "unhealthy"
+            ],
+            "description": "Overall service health status"
+          },
+          "version": {
+            "type": "string",
+            "example": "1.4.2",
+            "description": "Deployed service version"
+          },
+          "dependencies": {
+            "type": "object",
+            "description": "Health status of downstream dependencies"
+          },
+          "timestamp": {
+            "type": "string",
+            "description": "UTC timestamp of the health check response",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "status",
+          "timestamp"
+        ]
+      }
+order: 2000

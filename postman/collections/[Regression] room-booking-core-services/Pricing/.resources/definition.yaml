@@ -1,0 +1,9 @@
+$kind: collection
+description: |-
+  Regression scenarios for the three pricing endpoints: `/pricing/customer-credit`, `/pricing/rate-plans`, and `/pricing/room-charges`. Covers loyalty credit eligibility lookups, rate plan discovery with segment filtering, full room charge calculations with add-ons, and error cases for missing required fields (400) and unknown loyalty members (404). All requests require `Authorization: Bearer {{accessToken}}`.
+
+  **Endpoints covered:**
+  - `GET /pricing/customer-credit` — M life loyalty credit eligibility and daily credit amounts
+  - `GET /pricing/rate-plans` — Available rate plans for a property, optionally filtered by segment (LEISURE/CORPORATE/GROUP/MLIFE)
+  - `POST /pricing/room-charges` — Itemised pricing breakdown including nightly rate, resort fee, add-ons, tax, and total due
+order: 3000

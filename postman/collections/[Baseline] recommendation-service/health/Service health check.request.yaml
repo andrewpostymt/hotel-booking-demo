@@ -1,0 +1,10 @@
+$kind: http-request
+description: |
+  Returns the operational status of the recommendation service and its
+  downstream dependencies. Used by load balancers and monitoring probes.
+url: "{{baseUrl}}/health"
+method: GET
+headers:
+  Accept: application/json
+examples: ./.resources/Service health check.resources/examples
+order: 1000

@@ -1,0 +1,33 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/pricing/room-charges"
+  method: POST
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "propertyId": "GRAND-HOTEL-LV",
+        "roomTypeCode": "DELUXE-KING",
+        "ratePlanCode": "FLEX_RACK",
+        "checkIn": "2026-06-01",
+        "checkOut": "2026-06-03",
+        "guests": {
+          "adults": 2,
+          "children": 0
+        },
+        "addOns": [
+          { "code": "RESORT-FEE" },
+          { "code": "EARLY-CHECKIN" }
+        ]
+      }
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: '{"propertyId":"GRAND-HOTEL-LV","checkIn":"2026-06-01","checkOut":"2026-06-03","roomTypeCode":"DELUXE-KING","ratePlanCode":"FLEX_RACK","adults":2,"nights":2,"charges":{"baseRoomCharge":{"amount":578.00,"currency":"USD"},"taxes":{"amount":86.70,"currency":"USD","breakdown":[{"type":"STATE_TAX","rate":0.085,"amount":49.13},{"type":"RESORT_FEE","amount":37.57}]},"totalCharge":{"amount":664.70,"currency":"USD"}},"appliedCredits":{"amount":0.00,"currency":"USD"},"finalCharge":{"amount":664.70,"currency":"USD"}}'
+order: 1000

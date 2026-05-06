@@ -1,0 +1,18 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/pricing/customer-credit"
+  method: GET
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: ""
+response:
+  statusCode: 404
+  statusText: Not Found
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: '{"error":"MEMBER_NOT_FOUND","message":"No M life member found with the provided mlifeNumber","details":{"mlifeNumber":"MLF-NONEXISTENT-99999"}}'
+order: 1000

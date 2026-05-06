@@ -1,0 +1,35 @@
+$kind: http-request
+name: GET /pricing/rate-plans — With Segment Filter
+url: "{{baseUrl}}/pricing/rate-plans?propertyId=GRAND-HOTEL-LV&checkIn=2026-06-01&checkOut=2026-06-03&segment=LEISURE"
+method: GET
+description: |-
+  Extends the happy-path rate plans request by adding the optional `segment=LEISURE` query parameter. Verifies the API returns a 200 and that all returned rate plans with a `segment` field are scoped to LEISURE. Confirms segment-based filtering is enforced server-side. Response time must be under 3000ms.
+headers:
+  Authorization: Bearer {{accessToken}}
+queryParams:
+  propertyId: GRAND-HOTEL-LV
+  checkIn: '2026-06-01'
+  checkOut: '2026-06-03'
+  segment: LEISURE
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status code is 200", function () {
+          pm.response.to.have.status(200);
+      });
+
+      pm.test("All returned rate plans are LEISURE segment", function () {
+          const json = pm.response.json();
+          json.ratePlans.forEach(function(plan) {
+              if (plan.segment) {
+                  pm.expect(plan.segment).to.eql("LEISURE");
+              }
+          });
+      });
+
+      pm.test("Response time is under 3000ms", function () {
+          pm.expect(pm.response.responseTime).to.be.below(3000);
+      });
+    language: text/javascript
+examples: ./.resources/GET -pricing-rate-plans — With Segment Filter.resources/examples
+order: 4000

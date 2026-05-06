@@ -1,0 +1,54 @@
+$kind: http-request
+name: GET /reservations/{confirmationNumber} — Retrieve Reservation
+url: "{{baseUrl}}/reservations/{{confirmationNumber}}"
+method: GET
+description: |-
+  Retrieves the reservation identified by `{{confirmationNumber}}` (set by the Create Reservation request). Tests assert `confirmationNumber` is a non-empty string, `status` is one of CONFIRMED/PENDING/CANCELLED/MODIFIED, `propertyId`, `roomTypeCode`, `checkIn`, `checkOut`, and `totalDue` are all present. Run after the Create Reservation request to use the stored confirmation number. Response time must be under 3000ms.
+headers:
+  Authorization: Bearer {{accessToken}}
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status code is 200", function () {
+          pm.response.to.have.status(200);
+      });
+
+      pm.test("Response has confirmationNumber", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("confirmationNumber");
+          pm.expect(json.confirmationNumber).to.be.a("string").and.not.empty;
+      });
+
+      pm.test("Status is a valid enum value", function () {
+          const json = pm.response.json();
+          pm.expect(["CONFIRMED", "PENDING", "CANCELLED", "MODIFIED"]).to.include(json.status);
+      });
+
+      pm.test("Response has propertyId", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("propertyId");
+      });
+
+      pm.test("Response has roomTypeCode", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("roomTypeCode");
+      });
+
+      pm.test("Response has checkIn and checkOut", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("checkIn");
+          pm.expect(json).to.have.property("checkOut");
+      });
+
+      pm.test("Response has totalDue", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("totalDue");
+          pm.expect(json.totalDue).to.be.a("number");
+      });
+
+      pm.test("Response time is under 3000ms", function () {
+          pm.expect(pm.response.responseTime).to.be.below(3000);
+      });
+    language: text/javascript
+examples: ./.resources/GET -reservations-{confirmationNumber} — Retrieve Reservation.resources/examples
+order: 4000

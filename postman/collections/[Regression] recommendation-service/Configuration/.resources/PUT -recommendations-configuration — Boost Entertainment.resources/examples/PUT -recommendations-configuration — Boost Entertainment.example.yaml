@@ -1,0 +1,28 @@
+$kind: http-example
+name: PUT /recommendations/configuration — Boost Entertainment
+request:
+  url: "{{baseUrl}}/recommendations/configuration"
+  method: PUT
+  body:
+    type: json
+    content: |-
+      {
+        "offerWeights": {
+          "entertainment": 0.8,
+          "dining": 0.5,
+          "resort_package": 0.6
+        },
+        "blackoutDates": [],
+        "propertyOverrides": {
+          "ARIA": {
+            "showsOnlyEnabled": true
+          }
+        }
+      }
+response:
+  statusCode: 200
+  statusText: OK
+  body:
+    type: json
+    content: '{"configVersion": "v3.3.0", "updatedAt": "2026-05-05T22:40:00Z", "updatedBy": "admin@mgmresorts.com", "weights": {"roomScore": 0.30, "priceScore": 0.20, "showAffinityScore": 0.35, "loyaltyTierScore": 0.15}, "filters": {"minScore": 0.60, "maxRecommendations": 5, "excludeOverbookedRooms": true}, "featureFlags": {"enableShowPackageBundling": true, "enableDynamicPricing": true, "enableLoyaltyBoost": false}}'
+order: 1000

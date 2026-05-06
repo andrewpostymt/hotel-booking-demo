@@ -1,0 +1,15 @@
+$kind: http-example
+name: GET /recommendations — Happy Path (3-night stay)
+request:
+  url: "{{baseUrl}}/recommendations"
+  method: GET
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  body:
+    type: json
+    content: '{"orderId": "ORD-2026-00124857", "propertyCode": "ARIA", "stayNights": 3, "roomCount": 1, "generatedAt": "2026-05-05T22:40:00Z", "recommendations": [{"rank": 1, "roomTypeCode": "DELUXE-KING", "roomTypeName": "Deluxe King Room", "score": 0.97, "ratePlanCode": "FLEX_RACK", "ratePlanName": "Flexible Rate", "nightly": 289.00, "total": 867.00, "currency": "USD", "showPackages": [{"showId": "SH-CIRQUE-001", "showName": "Cirque du Soleil – O", "ticketTier": "PREMIUM", "pricePerPerson": 185.00}], "highlights": ["Strip view", "King bed", "Free cancellation until 48h before arrival"]}, {"rank": 2, "roomTypeCode": "PREMIUM-SUITE", "roomTypeName": "Premium Suite", "score": 0.91, "ratePlanCode": "ADVANCE_PURCHASE", "ratePlanName": "Advance Purchase", "nightly": 459.00, "total": 1377.00, "currency": "USD", "showPackages": [{"showId": "SH-CIRQUE-001", "showName": "Cirque du Soleil – O", "ticketTier": "VIP", "pricePerPerson": 265.00}], "highlights": ["Corner suite", "Panoramic Strip view", "Butler service"]}, {"rank": 3, "roomTypeCode": "STANDARD-QUEEN", "roomTypeName": "Standard Queen Room", "score": 0.84, "ratePlanCode": "FLEX_RACK", "ratePlanName": "Flexible Rate", "nightly": 189.00, "total": 567.00, "currency": "USD", "showPackages": [], "highlights": ["City view", "Two queen beds", "Free cancellation"]}]}'
+order: 1000

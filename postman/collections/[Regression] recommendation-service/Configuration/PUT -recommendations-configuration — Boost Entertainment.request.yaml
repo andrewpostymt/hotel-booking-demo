@@ -1,0 +1,66 @@
+$kind: http-request
+name: PUT /recommendations/configuration — Boost Entertainment
+url: "{{baseUrl}}/recommendations/configuration"
+method: PUT
+headers:
+  Authorization: Bearer {{accessToken}}
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "offerWeights": {
+        "entertainment": 0.8,
+        "dining": 0.5,
+        "resort_package": 0.6
+      },
+      "blackoutDates": [],
+      "propertyOverrides": {
+        "ARIA": {
+          "showsOnlyEnabled": true
+        }
+      }
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status code is 200", function () {
+          pm.response.to.have.status(200);
+      });
+
+      pm.test("Response has configVersion", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("configVersion");
+      });
+
+      pm.test("Response has lastUpdatedAt", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("lastUpdatedAt");
+      });
+
+      pm.test("Response has offerWeights", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("offerWeights");
+      });
+
+      pm.test("Entertainment weight matches request", function () {
+          const json = pm.response.json();
+          pm.expect(json.offerWeights.entertainment).to.eql(0.8);
+      });
+
+      pm.test("Dining weight matches request", function () {
+          const json = pm.response.json();
+          pm.expect(json.offerWeights.dining).to.eql(0.5);
+      });
+
+      pm.test("Resort package weight matches request", function () {
+          const json = pm.response.json();
+          pm.expect(json.offerWeights.resort_package).to.eql(0.6);
+      });
+
+      pm.test("Response time is under 3000ms", function () {
+          pm.expect(pm.response.responseTime).to.be.below(3000);
+      });
+    language: text/javascript
+examples: ./.resources/PUT -recommendations-configuration — Boost Entertainment.resources/examples
+order: 3000

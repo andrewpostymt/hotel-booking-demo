@@ -1,0 +1,64 @@
+$kind: http-request
+name: GET /pricing/rate-plans — Happy Path
+url: "{{baseUrl}}/pricing/rate-plans?propertyId=GRAND-HOTEL-LV&checkIn=2026-06-01&checkOut=2026-06-03"
+method: GET
+description: |-
+  Returns all available rate plans for property `GRAND-HOTEL-LV` from 2026-06-01 to 2026-06-03. Tests assert `propertyId` echoes back correctly, the `ratePlans` array is present, each plan has `code` and `name`, `segment` values (if present) are one of LEISURE/CORPORATE/GROUP/MLIFE, and `refundable` (if present) is a boolean. Response time must be under 3000ms.
+headers:
+  Authorization: Bearer {{accessToken}}
+queryParams:
+  propertyId: GRAND-HOTEL-LV
+  checkIn: '2026-06-01'
+  checkOut: '2026-06-03'
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status code is 200", function () {
+          pm.response.to.have.status(200);
+      });
+
+      pm.test("Response has propertyId", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("propertyId");
+          pm.expect(json.propertyId).to.eql("GRAND-HOTEL-LV");
+      });
+
+      pm.test("Response has ratePlans array", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("ratePlans");
+          pm.expect(json.ratePlans).to.be.an("array");
+      });
+
+      pm.test("Each rate plan has code and name", function () {
+          const json = pm.response.json();
+          json.ratePlans.forEach(function(plan) {
+              pm.expect(plan).to.have.property("code");
+              pm.expect(plan).to.have.property("name");
+          });
+      });
+
+      pm.test("segment values are valid enum values", function () {
+          const json = pm.response.json();
+          const validSegments = ["LEISURE", "CORPORATE", "GROUP", "MLIFE"];
+          json.ratePlans.forEach(function(plan) {
+              if (plan.segment) {
+                  pm.expect(validSegments).to.include(plan.segment);
+              }
+          });
+      });
+
+      pm.test("refundable is a boolean", function () {
+          const json = pm.response.json();
+          json.ratePlans.forEach(function(plan) {
+              if (plan.hasOwnProperty("refundable")) {
+                  pm.expect(plan.refundable).to.be.a("boolean");
+              }
+          });
+      });
+
+      pm.test("Response time is under 3000ms", function () {
+          pm.expect(pm.response.responseTime).to.be.below(3000);
+      });
+    language: text/javascript
+examples: ./.resources/GET -pricing-rate-plans — Happy Path.resources/examples
+order: 3000

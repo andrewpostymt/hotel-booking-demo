@@ -1,0 +1,20 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/reservations/:confirmationNumber"
+  method: DELETE
+  headers:
+    Content-Type: application/json
+  pathVariables:
+    confirmationNumber: HOTEL-CONF-2026-88421
+  body:
+    type: json
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: '{"confirmationNumber":"HOTEL-CONF-2026-88421","status":"CANCELLED","cancellationReason":"GUEST_REQUEST","cancellationFee":{"amount":0.00,"currency":"USD"},"refundAmount":{"amount":664.70,"currency":"USD"},"refundStatus":"PENDING","cancelledAt":"2026-05-05T23:45:00Z"}'
+order: 1000

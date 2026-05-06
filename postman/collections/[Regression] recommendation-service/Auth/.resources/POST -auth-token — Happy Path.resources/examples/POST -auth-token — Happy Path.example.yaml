@@ -1,0 +1,15 @@
+$kind: http-example
+name: POST /auth/token — Happy Path
+request:
+  url: "{{baseUrl}}/auth/token"
+  method: POST
+  body:
+    type: json
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  body:
+    type: json
+    content: '{"accessToken": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzZXJ2aWNlLWFjY291bnQtcmVjb21tZW5kYXRpb25zIiwiaWF0IjoxNzQ2NDgwMDAwLCJleHAiOjE3NDY1NjY0MDB9.signature", "tokenType": "Bearer", "expiresIn": 86400, "scope": "recommendations:read recommendations:write"}'
+order: 1000

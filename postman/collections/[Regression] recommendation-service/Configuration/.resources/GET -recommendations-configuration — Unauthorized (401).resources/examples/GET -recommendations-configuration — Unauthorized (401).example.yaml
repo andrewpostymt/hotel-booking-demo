@@ -1,0 +1,15 @@
+$kind: http-example
+name: GET /recommendations/configuration — Unauthorized (401)
+request:
+  url: "{{baseUrl}}/recommendations/configuration"
+  method: GET
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 401
+  statusText: Unauthorized
+  body:
+    type: json
+    content: '{"code": "UNAUTHORIZED", "message": "Missing or invalid Authorization header."}'
+order: 1000

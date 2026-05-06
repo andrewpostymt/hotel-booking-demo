@@ -1,0 +1,18 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/pricing/rate-plans"
+  method: GET
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: '{"propertyId":"GRAND-HOTEL-LV","checkIn":"2026-06-01","checkOut":"2026-06-03","ratePlans":[{"ratePlanCode":"FLEX_RACK","ratePlanName":"Flexible Rack Rate","segment":"LEISURE","refundable":true,"baseRate":{"amount":289.00,"currency":"USD"},"totalRate":{"amount":578.00,"currency":"USD"}},{"ratePlanCode":"ADVANCE_PURCHASE","ratePlanName":"Advance Purchase","segment":"LEISURE","refundable":false,"baseRate":{"amount":249.00,"currency":"USD"},"totalRate":{"amount":498.00,"currency":"USD"}},{"ratePlanCode":"CORP_STANDARD","ratePlanName":"Corporate Standard","segment":"CORPORATE","refundable":true,"baseRate":{"amount":269.00,"currency":"USD"},"totalRate":{"amount":538.00,"currency":"USD"}}]}'
+order: 1000

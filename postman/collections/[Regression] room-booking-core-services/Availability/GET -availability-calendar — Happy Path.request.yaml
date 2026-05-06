@@ -1,0 +1,62 @@
+$kind: http-request
+name: GET /availability/calendar — Happy Path
+url: "{{baseUrl}}/availability/calendar?propertyId=GRAND-HOTEL-LV&checkIn=2026-06-01&checkOut=2026-06-03&adults=2&children=0"
+method: GET
+description: |-
+  Returns a day-by-day availability calendar for property `GRAND-HOTEL-LV` from 2026-06-01 to 2026-06-03 for 2 adults. Tests assert the response contains `propertyId` matching the request, a non-empty `currency` string, a `days` array where each entry has a `date` and a boolean `available` field, and that all dates are valid ISO date strings. Response time must be under 3000ms.
+headers:
+  Authorization: Bearer {{accessToken}}
+queryParams:
+  propertyId: GRAND-HOTEL-LV
+  checkIn: '2026-06-01'
+  checkOut: '2026-06-03'
+  adults: "2"
+  children: "0"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status code is 200", function () {
+          pm.response.to.have.status(200);
+      });
+
+      pm.test("Response has propertyId", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("propertyId");
+          pm.expect(json.propertyId).to.eql("GRAND-HOTEL-LV");
+      });
+
+      pm.test("Response has currency", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("currency");
+          pm.expect(json.currency).to.be.a("string").and.not.empty;
+      });
+
+      pm.test("Response has days array", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("days");
+          pm.expect(json.days).to.be.an("array");
+      });
+
+      pm.test("Each day has date and available fields", function () {
+          const json = pm.response.json();
+          json.days.forEach(function(day) {
+              pm.expect(day).to.have.property("date");
+              pm.expect(day).to.have.property("available");
+              pm.expect(day.available).to.be.a("boolean");
+          });
+      });
+
+      pm.test("Day dates are valid date strings", function () {
+          const json = pm.response.json();
+          json.days.forEach(function(day) {
+              const date = new Date(day.date);
+              pm.expect(date.toString()).to.not.eql("Invalid Date");
+          });
+      });
+
+      pm.test("Response time is under 3000ms", function () {
+          pm.expect(pm.response.responseTime).to.be.below(3000);
+      });
+    language: text/javascript
+examples: ./.resources/GET -availability-calendar — Happy Path.resources/examples
+order: 1000

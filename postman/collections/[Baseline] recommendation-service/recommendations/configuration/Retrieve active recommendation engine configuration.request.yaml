@@ -1,0 +1,11 @@
+$kind: http-request
+description: |
+  Returns the current configuration state of the recommendation engine,
+  including active offer weightings, blackout dates, and property-level
+  override flags. Used by the platform team for live configuration inspection.
+url: "{{baseUrl}}/recommendations/configuration"
+method: GET
+headers:
+  Accept: application/json
+examples: ./.resources/Retrieve active recommendation engine configuration.resources/examples
+order: 1000

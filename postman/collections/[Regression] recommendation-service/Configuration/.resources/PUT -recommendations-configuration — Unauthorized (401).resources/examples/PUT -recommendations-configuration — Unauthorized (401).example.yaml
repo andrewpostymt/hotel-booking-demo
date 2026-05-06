@@ -1,0 +1,20 @@
+$kind: http-example
+name: PUT /recommendations/configuration — Unauthorized (401)
+request:
+  url: "{{baseUrl}}/recommendations/configuration"
+  method: PUT
+  body:
+    type: json
+    content: |-
+      {
+        "offerWeights": {
+          "entertainment": 0.5
+        }
+      }
+response:
+  statusCode: 401
+  statusText: Unauthorized
+  body:
+    type: json
+    content: '{"code": "UNAUTHORIZED", "message": "Missing or invalid Authorization header."}'
+order: 1000

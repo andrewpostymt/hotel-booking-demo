@@ -1,0 +1,61 @@
+$kind: http-request
+name: DELETE /reservations/{confirmationNumber} — Cancel Reservation
+url: "{{baseUrl}}/reservations/{{confirmationNumber}}?reason=GUEST_REQUEST"
+method: DELETE
+description: |-
+  Cancels the reservation identified by `{{confirmationNumber}}` (set by the Create Reservation request) with reason `GUEST_REQUEST`. Tests assert `confirmationNumber` is present, `status` is CANCELLED, `refundEligible` is a boolean, `cancelledAt` is a valid ISO 8601 timestamp, `refundAmount` is present and positive when `refundEligible` is true, and `penaltyAmount` is present when `refundEligible` is false. Response time must be under 5000ms.
+headers:
+  Authorization: Bearer {{accessToken}}
+queryParams:
+  reason: GUEST_REQUEST
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status code is 200", function () {
+          pm.response.to.have.status(200);
+      });
+
+      pm.test("Response has confirmationNumber", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("confirmationNumber");
+      });
+
+      pm.test("Status is CANCELLED", function () {
+          const json = pm.response.json();
+          pm.expect(json.status).to.eql("CANCELLED");
+      });
+
+      pm.test("Response has refundEligible boolean", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("refundEligible");
+          pm.expect(json.refundEligible).to.be.a("boolean");
+      });
+
+      pm.test("Response has cancelledAt timestamp", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("cancelledAt");
+          const date = new Date(json.cancelledAt);
+          pm.expect(date.toString()).to.not.eql("Invalid Date");
+      });
+
+      pm.test("If refundEligible, refundAmount is present and positive", function () {
+          const json = pm.response.json();
+          if (json.refundEligible) {
+              pm.expect(json).to.have.property("refundAmount");
+              pm.expect(json.refundAmount).to.be.a("number").and.to.be.above(0);
+          }
+      });
+
+      pm.test("If not refundEligible, penaltyAmount is present", function () {
+          const json = pm.response.json();
+          if (!json.refundEligible) {
+              pm.expect(json).to.have.property("penaltyAmount");
+          }
+      });
+
+      pm.test("Response time is under 5000ms", function () {
+          pm.expect(pm.response.responseTime).to.be.below(5000);
+      });
+    language: text/javascript
+examples: ./.resources/DELETE -reservations-{confirmationNumber} — Cancel Reservation.resources/examples
+order: 8000

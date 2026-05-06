@@ -1,0 +1,20 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/reservations/:confirmationNumber"
+  method: GET
+  headers:
+    Content-Type: application/json
+  pathVariables:
+    confirmationNumber: HOTEL-CONF-2026-88421
+  body:
+    type: json
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: '{"confirmationNumber":"HOTEL-CONF-2026-88421","status":"CONFIRMED","propertyId":"GRAND-HOTEL-LV","propertyName":"Grand Hotel Las Vegas","checkIn":"2026-06-01","checkOut":"2026-06-03","nights":2,"roomTypeCode":"DELUXE-KING","roomTypeName":"Deluxe King Room","ratePlanCode":"FLEX_RACK","guests":{"adults":2,"children":0},"primaryGuest":{"firstName":"John","lastName":"Smith","email":"john.smith@example.com","phone":"+1-555-0100"},"charges":{"totalCharge":{"amount":664.70,"currency":"USD"}},"createdAt":"2026-05-05T23:00:00Z","lastModifiedAt":"2026-05-05T23:00:00Z"}'
+order: 1000

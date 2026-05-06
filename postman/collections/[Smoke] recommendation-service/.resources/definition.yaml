@@ -1,0 +1,21 @@
+$kind: collection
+description: |-
+  Cross-sell and upsell recommendation engine for the room booking flow.
+  Returns personalized offers based on order context, stay parameters, and guest preferences.
+  Integrates with the room booking service to surface additional revenue opportunities
+  post-booking and at key funnel steps.
+
+
+  Contact Support:
+   Name: Room Booking Services Team
+   Email: api-team@example-hospitality.com
+variables:
+  baseUrl: https://recommendation-dev.example-hospitality.com
+auth:
+  - id: 23f4968e-ddcf-4a22-8a76-14bf7975205e
+    type: oauth2
+    name: oauth2 auth
+    credentials:
+      scope: recommendations:read recommendations:write configuration:read configuration:write
+      accessTokenUrl: /auth/token
+      grant_type: client_credentials

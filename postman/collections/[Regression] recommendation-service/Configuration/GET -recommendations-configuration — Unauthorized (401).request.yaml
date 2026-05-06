@@ -1,0 +1,25 @@
+$kind: http-request
+name: GET /recommendations/configuration — Unauthorized (401)
+url: "{{baseUrl}}/recommendations/configuration"
+method: GET
+headers:
+  Authorization: ""
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status code is 401", function () {
+          pm.response.to.have.status(401);
+      });
+
+      pm.test("Response has code and message", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("code");
+          pm.expect(json).to.have.property("message");
+      });
+
+      pm.test("Response time is under 2000ms", function () {
+          pm.expect(pm.response.responseTime).to.be.below(2000);
+      });
+    language: text/javascript
+examples: ./.resources/GET -recommendations-configuration — Unauthorized (401).resources/examples
+order: 2000

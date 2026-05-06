@@ -1,0 +1,32 @@
+$kind: http-request
+name: GET /availability/grid — Invalid Date Range (400)
+url: "{{baseUrl}}/availability/grid?checkIn=2026-06-05&checkOut=2026-06-01&adults=2&propertyIds=GRAND-HOTEL-LV"
+method: GET
+description: |-
+  Negative test: submits a grid request where `checkIn` (2026-06-05) is after `checkOut` (2026-06-01). Expects a 400 Bad Request with `code` and `message` fields. Confirms the grid endpoint applies the same date-range validation as the calendar endpoint. Response time must be under 2000ms.
+headers:
+  Authorization: Bearer {{accessToken}}
+queryParams:
+  checkIn: '2026-06-05'
+  checkOut: '2026-06-01'
+  adults: "2"
+  propertyIds: GRAND-HOTEL-LV
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status code is 400", function () {
+          pm.response.to.have.status(400);
+      });
+
+      pm.test("Response has code and message", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("code");
+          pm.expect(json).to.have.property("message");
+      });
+
+      pm.test("Response time is under 2000ms", function () {
+          pm.expect(pm.response.responseTime).to.be.below(2000);
+      });
+    language: text/javascript
+examples: ./.resources/GET -availability-grid — Invalid Date Range (400).resources/examples
+order: 9000

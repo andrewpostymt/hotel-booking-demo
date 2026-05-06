@@ -1,0 +1,18 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/availability/calendar"
+  method: GET
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: '{"propertyId":"GRAND-HOTEL-LV","checkIn":"2026-06-01","checkOut":"2026-06-03","adults":2,"ratePlanCode":"FLEX_RACK","dates":[{"date":"2026-06-01","available":true,"remainingRooms":5,"lowestRate":{"amount":349.00,"currency":"USD","ratePlanCode":"FLEX_RACK","ratePlanName":"Flexible Rack Rate"}},{"date":"2026-06-02","available":true,"remainingRooms":3,"lowestRate":{"amount":379.00,"currency":"USD","ratePlanCode":"FLEX_RACK","ratePlanName":"Flexible Rack Rate"}}]}'
+order: 1000

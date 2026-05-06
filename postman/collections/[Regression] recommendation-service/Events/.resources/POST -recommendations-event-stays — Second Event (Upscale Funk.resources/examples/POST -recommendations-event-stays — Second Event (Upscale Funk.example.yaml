@@ -1,0 +1,25 @@
+$kind: http-example
+name: POST /recommendations/event-stays — Second Event (Upscale Funk)
+request:
+  url: "{{baseUrl}}/recommendations/event-stays"
+  method: POST
+  body:
+    type: json
+    content: |-
+      {
+        "eventId": "EVT-UF-GARDEN-2026",
+        "eventName": "Upscale Funk at Garden Arena",
+        "propertyCode": "GRAND_HOTEL",
+        "preferredCheckIn": "2026-05-20",
+        "preferredCheckOut": "2026-05-21",
+        "roomCount": 1,
+        "guestCount": 2,
+        "orderId": null
+      }
+response:
+  statusCode: 201
+  statusText: Created
+  body:
+    type: json
+    content: '{"preferenceId": "PREF-2026-00002", "eventId": "EVT-UPSCALEFUNK-2026-07", "eventName": "Upscale Funk – Summer Residency", "propertyCode": "VDARA", "submittedAt": "2026-05-05T22:40:00Z", "stayPreferences": {"checkIn": "2026-07-19", "checkOut": "2026-07-21", "adults": 2, "children": 1, "roomTypePreferences": ["STUDIO-SUITE"], "budgetPerNight": {"min": 150, "max": 350, "currency": "USD"}}, "status": "PENDING_MATCH"}'
+order: 1000

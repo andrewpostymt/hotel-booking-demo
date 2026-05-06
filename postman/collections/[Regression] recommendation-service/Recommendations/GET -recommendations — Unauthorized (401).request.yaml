@@ -1,0 +1,31 @@
+$kind: http-request
+name: GET /recommendations — Unauthorized (401)
+url: "{{baseUrl}}/recommendations?orderId=ORD-2026-00124857"
+method: GET
+headers:
+  Authorization: ""
+queryParams:
+  orderId: ORD-2026-00124857
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status code is 401", function () {
+          pm.response.to.have.status(401);
+      });
+
+      pm.test("Response has code field", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("code");
+      });
+
+      pm.test("Response has message field", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("message");
+      });
+
+      pm.test("Response time is under 2000ms", function () {
+          pm.expect(pm.response.responseTime).to.be.below(2000);
+      });
+    language: text/javascript
+examples: ./.resources/GET -recommendations — Unauthorized (401).resources/examples
+order: 4000

@@ -1,0 +1,43 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/reservations"
+  method: POST
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "propertyId": "GRAND-HOTEL-LV",
+        "roomTypeCode": "DELUXE-KING",
+        "ratePlanCode": "FLEX_RACK",
+        "checkIn": "2026-06-01",
+        "checkOut": "2026-06-03",
+        "guests": {
+          "adults": 2,
+          "children": 0,
+          "primary": {
+            "firstName": "Jane",
+            "lastName": "Smith",
+            "email": "jane.smith@example.com",
+            "phone": "+17025550100",
+            "mlifeNumber": "MLF-8823491"
+          }
+        },
+        "payment": {
+          "type": "CREDIT_CARD",
+          "token": "tok_visa_4242"
+        },
+        "addOns": [
+          { "code": "RESORT-FEE" }
+        ]
+      }
+response:
+  statusCode: 201
+  statusText: Created
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: '{"confirmationNumber":"HOTEL-CONF-2026-88421","status":"CONFIRMED","propertyId":"GRAND-HOTEL-LV","propertyName":"Grand Hotel Las Vegas","checkIn":"2026-06-01","checkOut":"2026-06-03","nights":2,"roomTypeCode":"DELUXE-KING","roomTypeName":"Deluxe King Room","ratePlanCode":"FLEX_RACK","guests":{"adults":2,"children":0},"primaryGuest":{"firstName":"John","lastName":"Smith","email":"john.smith@example.com","phone":"+1-555-0100"},"charges":{"totalCharge":{"amount":664.70,"currency":"USD"},"depositRequired":{"amount":332.35,"currency":"USD"}},"createdAt":"2026-05-05T23:00:00Z"}'
+order: 1000

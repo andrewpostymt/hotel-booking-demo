@@ -1,0 +1,177 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/recommendations?orderId=ORD-2026-00124857&roomCount=1&stayNights=3&showsOnly=false&propertyCode=ARIA"
+  method: GET
+  headers:
+    - key: Accept
+      value: application/json
+    - key: Authorization
+      value: <token>
+      description: "Added as a part of security scheme: oauth2"
+  queryParams:
+    - key: orderId
+      value: ORD-2026-00124857
+      description: Unique identifier of the confirmed booking order
+    - key: roomCount
+      value: "1"
+      description: Number of rooms in the order — influences bundle sizing for recommendations
+    - key: stayNights
+      value: "3"
+      description: Length of stay in nights — drives offer selection logic
+    - key: showsOnly
+      value: "false"
+      description: |
+        When true, filters recommendations to entertainment and show offers only.
+        Used in the post-booking upsell flow for guests who have not added show tickets.
+    - key: propertyCode
+      value: ARIA
+      description: Hotel property code to scope recommendations to a specific property
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: text
+    content: |-
+      {
+        "orderId": "ORD-2026-00124857",
+        "propertyCode": "ARIA",
+        "recommendations": [
+          {
+            "offerId": "OFR-SHOW-BM-001",
+            "offerType": "entertainment",
+            "title": "Bruno Mars at Dolby Live",
+            "description": "Add show tickets to your stay — limited availability for your dates.",
+            "price": 199,
+            "currency": "USD",
+            "rank": 1,
+            "availableQuantity": 4,
+            "expiresAt": "2026-05-10T23:59:59Z"
+          },
+          {
+            "offerId": "OFR-DINING-001",
+            "offerType": "dining",
+            "title": "Nobu Restaurant — Priority Reservation",
+            "description": "Reserve your table at Nobu with guaranteed seating during your stay.",
+            "price": 0,
+            "currency": "USD",
+            "rank": 2,
+            "availableQuantity": 2,
+            "expiresAt": "2026-05-10T23:59:59Z"
+          },
+          {
+            "offerId": "OFR-PKG-SPA-001",
+            "offerType": "resort_package",
+            "title": "Spa + Late Checkout Package",
+            "description": "Extend your relaxation with a 60-min treatment and 2pm checkout.",
+            "price": 149,
+            "currency": "USD",
+            "rank": 3,
+            "availableQuantity": 8,
+            "expiresAt": "2026-05-10T23:59:59Z"
+          }
+        ],
+        "generatedAt": "2026-04-29T14:00:00Z",
+        "totalCount": 3
+      }
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "type": "string",
+            "description": "Order ID this recommendation set is associated with"
+          },
+          "propertyCode": {
+            "type": "string",
+            "example": "ARIA",
+            "description": "Hotel property code for scoped recommendations"
+          },
+          "recommendations": {
+            "type": "array",
+            "description": "Ranked list of personalized offers",
+            "items": {
+              "type": "object",
+              "properties": {
+                "offerId": {
+                  "type": "string",
+                  "example": "OFR-SHOW-BM-001",
+                  "description": "Unique offer identifier"
+                },
+                "offerType": {
+                  "type": "string",
+                  "enum": [
+                    "entertainment",
+                    "dining",
+                    "resort_package",
+                    "room_upgrade",
+                    "transportation"
+                  ],
+                  "description": "Category of the recommendation offer"
+                },
+                "title": {
+                  "type": "string",
+                  "example": "Bruno Mars at Dolby Live",
+                  "description": "Human-readable offer title displayed in the booking UI"
+                },
+                "description": {
+                  "type": "string",
+                  "description": "Brief marketing description of the offer"
+                },
+                "price": {
+                  "type": "number",
+                  "example": 199,
+                  "description": "Offer price; 0.00 for complimentary offers",
+                  "format": "float"
+                },
+                "currency": {
+                  "type": "string",
+                  "example": "USD",
+                  "description": "ISO 4217 currency code"
+                },
+                "rank": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "example": 1,
+                  "description": "Engine-assigned rank (1 = highest priority)"
+                },
+                "availableQuantity": {
+                  "type": "integer",
+                  "example": 4,
+                  "description": "Remaining inventory for this offer"
+                },
+                "expiresAt": {
+                  "type": "string",
+                  "description": "Offer expiry timestamp — after this the offer is no longer bookable",
+                  "format": "date-time"
+                }
+              },
+              "required": [
+                "offerId",
+                "offerType",
+                "title",
+                "price",
+                "currency",
+                "rank"
+              ]
+            }
+          },
+          "generatedAt": {
+            "type": "string",
+            "description": "UTC timestamp when the recommendation set was generated",
+            "format": "date-time"
+          },
+          "totalCount": {
+            "type": "integer",
+            "description": "Total number of recommendations returned"
+          }
+        },
+        "required": [
+          "orderId",
+          "recommendations",
+          "generatedAt",
+          "totalCount"
+        ]
+      }
+order: 1000

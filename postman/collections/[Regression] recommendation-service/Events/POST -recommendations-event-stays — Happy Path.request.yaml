@@ -1,0 +1,57 @@
+$kind: http-request
+name: POST /recommendations/event-stays — Happy Path
+url: "{{baseUrl}}/recommendations/event-stays"
+method: POST
+headers:
+  Authorization: Bearer {{accessToken}}
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "eventId": "EVT-BM-DOLBY-2026",
+      "eventName": "Bruno Mars at Dolby Live",
+      "propertyCode": "ARIA",
+      "preferredCheckIn": "2026-05-15",
+      "preferredCheckOut": "2026-05-17",
+      "roomCount": 1,
+      "guestCount": 2,
+      "orderId": null
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status code is 201", function () {
+          pm.response.to.have.status(201);
+      });
+
+      pm.test("Response has preferenceId", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("preferenceId");
+          pm.expect(json.preferenceId).to.be.a("string").and.not.empty;
+      });
+
+      pm.test("Response has eventId matching request", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("eventId");
+          pm.expect(json.eventId).to.eql("EVT-BM-DOLBY-2026");
+      });
+
+      pm.test("Response has status field with valid enum value", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("status");
+          pm.expect(["queued", "processing", "completed", "expired"]).to.include(json.status);
+      });
+
+      pm.test("Response time is under 3000ms", function () {
+          pm.expect(pm.response.responseTime).to.be.below(3000);
+      });
+
+      // Store preferenceId for potential follow-up tests
+      if (pm.response.code === 201) {
+          const json = pm.response.json();
+          pm.environment.set("preferenceId", json.preferenceId);
+      }
+    language: text/javascript
+examples: ./.resources/POST -recommendations-event-stays — Happy Path.resources/examples
+order: 1000

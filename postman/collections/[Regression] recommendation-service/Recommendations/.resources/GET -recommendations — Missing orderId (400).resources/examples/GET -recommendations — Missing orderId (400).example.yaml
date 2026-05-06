@@ -1,0 +1,15 @@
+$kind: http-example
+name: GET /recommendations — Missing orderId (400)
+request:
+  url: "{{baseUrl}}/recommendations"
+  method: GET
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 400
+  statusText: Bad Request
+  body:
+    type: json
+    content: "{\"code\": \"MISSING_REQUIRED_PARAMETER\", \"message\": \"Query parameter 'orderId' is required.\"}"
+order: 1000

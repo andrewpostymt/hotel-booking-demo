@@ -1,0 +1,18 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/availability/grid"
+  method: GET
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: ""
+response:
+  statusCode: 400
+  statusText: Bad Request
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: '{"error":"INVALID_DATE_RANGE","message":"checkOut date must be after checkIn date","details":{"checkIn":"2026-06-05","checkOut":"2026-06-01"}}'
+order: 1000

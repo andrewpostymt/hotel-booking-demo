@@ -1,0 +1,55 @@
+$kind: http-request
+name: GET /health — Service Healthy
+url: "{{baseUrl}}/health"
+method: GET
+description: |-
+  Verifies the service is live and healthy. Returns `status` (UP/DEGRADED/DOWN), `version`, `uptime` percentage, `timestamp`, and a `dependencies` map showing the health of database, cache, and payment gateway. No authentication required. Tests assert status is UP, version is a non-empty string, timestamp is valid ISO 8601, Content-Type is application/json, and response time is under 1000ms.
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status code is 200", function () {
+          pm.response.to.have.status(200);
+      });
+
+      pm.test("Response has status field", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("status");
+      });
+
+      pm.test("Status is one of UP/DEGRADED/DOWN", function () {
+          const json = pm.response.json();
+          pm.expect(["UP", "DEGRADED", "DOWN"]).to.include(json.status);
+      });
+
+      pm.test("Service is UP", function () {
+          const json = pm.response.json();
+          pm.expect(json.status).to.eql("UP");
+      });
+
+      pm.test("Response has version field", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("version");
+          pm.expect(json.version).to.be.a("string").and.not.empty;
+      });
+
+      pm.test("Response has timestamp field", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("timestamp");
+      });
+
+      pm.test("Timestamp is a valid ISO 8601 date-time", function () {
+          const json = pm.response.json();
+          const date = new Date(json.timestamp);
+          pm.expect(date.toString()).to.not.eql("Invalid Date");
+      });
+
+      pm.test("Content-Type is application/json", function () {
+          pm.expect(pm.response.headers.get("Content-Type")).to.include("application/json");
+      });
+
+      pm.test("Response time is under 1000ms", function () {
+          pm.expect(pm.response.responseTime).to.be.below(1000);
+      });
+    language: text/javascript
+examples: ./.resources/GET -health — Service Healthy.resources/examples
+order: 1000

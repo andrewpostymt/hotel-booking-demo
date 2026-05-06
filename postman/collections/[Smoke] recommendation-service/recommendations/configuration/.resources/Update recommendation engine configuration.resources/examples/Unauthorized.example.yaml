@@ -1,0 +1,73 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/recommendations/configuration"
+  method: PUT
+  headers:
+    - key: Content-Type
+      value: application/json
+    - key: Accept
+      value: application/json
+    - key: Authorization
+      value: <token>
+      description: "Added as a part of security scheme: oauth2"
+  body:
+    type: json
+    content: |-
+      {
+        "offerWeights": {
+          "entertainment": 0.8,
+          "dining": 0.5,
+          "resort_package": 0.6
+        },
+        "blackoutDates": [],
+        "propertyOverrides": {
+          "ARIA": {
+            "showsOnlyEnabled": true
+          }
+        }
+      }
+response:
+  statusCode: 401
+  statusText: Unauthorized
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "code": "VALIDATION_ERROR",
+        "message": "orderId is required",
+        "detail": "Query parameter 'orderId' must be provided",
+        "traceId": "trace-00124857-abc"
+      }
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "example": "VALIDATION_ERROR",
+            "description": "Machine-readable error code"
+          },
+          "message": {
+            "type": "string",
+            "example": "orderId is required",
+            "description": "Human-readable error summary"
+          },
+          "detail": {
+            "type": "string",
+            "example": "Query parameter 'orderId' must be provided",
+            "description": "Extended error detail for debugging"
+          },
+          "traceId": {
+            "type": "string",
+            "example": "trace-00124857-abc",
+            "description": "Distributed trace ID for log correlation"
+          }
+        },
+        "required": [
+          "code",
+          "message"
+        ]
+      }
+order: 3000

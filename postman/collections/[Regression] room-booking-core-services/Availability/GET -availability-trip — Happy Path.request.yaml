@@ -1,0 +1,76 @@
+$kind: http-request
+name: GET /availability/trip — Happy Path
+url: "{{baseUrl}}/availability/trip?propertyId=GRAND-HOTEL-LV&checkIn=2026-06-01&checkOut=2026-06-03&adults=2&children=0"
+method: GET
+description: |-
+  Returns detailed room-level availability for property `GRAND-HOTEL-LV` from 2026-06-01 to 2026-06-03 for 2 adults. Tests assert `propertyId`, `checkIn`, and `checkOut` echo back correctly, a `guests` object with `adults` is present, the `rooms` array is non-empty, each room has `roomTypeCode` and a boolean `available`, and that `nightlyRate` is a positive number for all available rooms. Response time must be under 3000ms.
+headers:
+  Authorization: Bearer {{accessToken}}
+queryParams:
+  propertyId: GRAND-HOTEL-LV
+  checkIn: '2026-06-01'
+  checkOut: '2026-06-03'
+  adults: "2"
+  children: "0"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status code is 200", function () {
+          pm.response.to.have.status(200);
+      });
+
+      pm.test("Response has propertyId", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("propertyId");
+          pm.expect(json.propertyId).to.eql("GRAND-HOTEL-LV");
+      });
+
+      pm.test("Response has checkIn and checkOut", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("checkIn");
+          pm.expect(json).to.have.property("checkOut");
+      });
+
+      pm.test("checkIn matches request", function () {
+          const json = pm.response.json();
+          pm.expect(json.checkIn).to.eql("2026-06-01");
+      });
+
+      pm.test("checkOut matches request", function () {
+          const json = pm.response.json();
+          pm.expect(json.checkOut).to.eql("2026-06-03");
+      });
+
+      pm.test("Response has guests object", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("guests");
+          pm.expect(json.guests).to.have.property("adults");
+      });
+
+      pm.test("Response has rooms array", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("rooms");
+          pm.expect(json.rooms).to.be.an("array");
+      });
+
+      pm.test("Each room has required fields", function () {
+          const json = pm.response.json();
+          json.rooms.forEach(function(room) {
+              pm.expect(room).to.have.property("roomTypeCode");
+              pm.expect(room).to.have.property("available");
+          });
+      });
+
+      pm.test("nightlyRate is a positive number for available rooms", function () {
+          const json = pm.response.json();
+          json.rooms.filter(r => r.available).forEach(function(room) {
+              pm.expect(room.nightlyRate).to.be.a("number").and.to.be.above(0);
+          });
+      });
+
+      pm.test("Response time is under 3000ms", function () {
+          pm.expect(pm.response.responseTime).to.be.below(3000);
+      });
+    language: text/javascript
+examples: ./.resources/GET -availability-trip — Happy Path.resources/examples
+order: 5000

@@ -1,0 +1,18 @@
+$kind: http-example
+name: POST /recommendations/event-stays — Missing Required Fields (400)
+request:
+  url: "{{baseUrl}}/recommendations/event-stays"
+  method: POST
+  body:
+    type: json
+    content: |-
+      {
+        "eventId": "EVT-BM-DOLBY-2026"
+      }
+response:
+  statusCode: 400
+  statusText: Bad Request
+  body:
+    type: json
+    content: '{"code": "VALIDATION_ERROR", "message": "Request body validation failed.", "details": [{"field": "eventId", "issue": "Field is required."}, {"field": "stayPreferences.checkIn", "issue": "Field is required."}]}'
+order: 1000

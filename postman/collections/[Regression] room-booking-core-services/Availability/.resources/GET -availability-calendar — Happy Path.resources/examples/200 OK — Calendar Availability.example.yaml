@@ -1,0 +1,18 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/availability/calendar"
+  method: GET
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: '{"propertyId":"GRAND-HOTEL-LV","checkIn":"2026-06-01","checkOut":"2026-06-03","adults":2,"children":0,"dates":[{"date":"2026-06-01","available":true,"remainingRooms":12,"lowestRate":{"amount":289.00,"currency":"USD"}},{"date":"2026-06-02","available":true,"remainingRooms":8,"lowestRate":{"amount":319.00,"currency":"USD"}}]}'
+order: 1000

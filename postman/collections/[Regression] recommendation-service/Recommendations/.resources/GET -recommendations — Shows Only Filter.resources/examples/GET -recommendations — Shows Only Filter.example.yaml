@@ -1,0 +1,15 @@
+$kind: http-example
+name: GET /recommendations — Shows Only Filter
+request:
+  url: "{{baseUrl}}/recommendations"
+  method: GET
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  body:
+    type: json
+    content: '{"orderId": "ORD-2026-00198432", "propertyCode": "GRAND_HOTEL", "stayNights": null, "roomCount": null, "generatedAt": "2026-05-05T22:40:00Z", "recommendations": [{"rank": 1, "roomTypeCode": null, "roomTypeName": null, "score": 0.99, "ratePlanCode": null, "ratePlanName": null, "nightly": null, "total": null, "currency": "USD", "showPackages": [{"showId": "SH-BLUEMANGROUP-001", "showName": "Blue Man Group", "ticketTier": "STANDARD", "pricePerPerson": 89.00}, {"showId": "SH-DAVIDCOPPERFIELD-001", "showName": "David Copperfield", "ticketTier": "PREMIUM", "pricePerPerson": 125.00}], "highlights": ["Top-rated shows for your dates"]}]}'
+order: 1000

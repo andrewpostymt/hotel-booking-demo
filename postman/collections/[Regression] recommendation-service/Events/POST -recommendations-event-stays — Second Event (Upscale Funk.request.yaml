@@ -1,0 +1,45 @@
+$kind: http-request
+name: POST /recommendations/event-stays — Second Event (Upscale Funk)
+url: "{{baseUrl}}/recommendations/event-stays"
+method: POST
+headers:
+  Authorization: Bearer {{accessToken}}
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "eventId": "EVT-UF-GARDEN-2026",
+      "eventName": "Upscale Funk at Garden Arena",
+      "propertyCode": "GRAND_HOTEL",
+      "preferredCheckIn": "2026-05-20",
+      "preferredCheckOut": "2026-05-21",
+      "roomCount": 1,
+      "guestCount": 2,
+      "orderId": null
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status code is 201", function () {
+          pm.response.to.have.status(201);
+      });
+
+      pm.test("Response has required fields", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("preferenceId");
+          pm.expect(json).to.have.property("eventId");
+          pm.expect(json).to.have.property("status");
+      });
+
+      pm.test("eventId matches request", function () {
+          const json = pm.response.json();
+          pm.expect(json.eventId).to.eql("EVT-UF-GARDEN-2026");
+      });
+
+      pm.test("Response time is under 3000ms", function () {
+          pm.expect(pm.response.responseTime).to.be.below(3000);
+      });
+    language: text/javascript
+examples: ./.resources/POST -recommendations-event-stays — Second Event (Upscale Funk.resources/examples
+order: 2000

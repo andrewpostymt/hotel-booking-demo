@@ -1,0 +1,24 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/reservations/:confirmationNumber"
+  method: PUT
+  headers:
+    Content-Type: application/json
+  pathVariables:
+    confirmationNumber: HOTEL-NONEXISTENT-99999
+  body:
+    type: json
+    content: |-
+      {
+        "checkIn": "2026-06-02",
+        "checkOut": "2026-06-04"
+      }
+response:
+  statusCode: 404
+  statusText: Not Found
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: '{"error":"RESERVATION_NOT_FOUND","message":"No reservation found with the provided confirmation number","details":{"confirmationNumber":"HOTEL-NONEXISTENT-99999"}}'
+order: 1000

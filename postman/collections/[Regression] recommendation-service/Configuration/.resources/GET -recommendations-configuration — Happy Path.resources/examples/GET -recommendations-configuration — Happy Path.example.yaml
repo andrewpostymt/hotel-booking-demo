@@ -1,0 +1,15 @@
+$kind: http-example
+name: GET /recommendations/configuration — Happy Path
+request:
+  url: "{{baseUrl}}/recommendations/configuration"
+  method: GET
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  body:
+    type: json
+    content: '{"configVersion": "v3.2.0", "updatedAt": "2026-04-20T10:00:00Z", "updatedBy": "admin@mgmresorts.com", "weights": {"roomScore": 0.40, "priceScore": 0.25, "showAffinityScore": 0.20, "loyaltyTierScore": 0.15}, "filters": {"minScore": 0.60, "maxRecommendations": 5, "excludeOverbookedRooms": true}, "featureFlags": {"enableShowPackageBundling": true, "enableDynamicPricing": true, "enableLoyaltyBoost": false}}'
+order: 1000

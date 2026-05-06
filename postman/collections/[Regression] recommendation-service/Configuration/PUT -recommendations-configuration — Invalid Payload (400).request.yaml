@@ -1,0 +1,38 @@
+$kind: http-request
+name: PUT /recommendations/configuration — Invalid Payload (400)
+url: "{{baseUrl}}/recommendations/configuration"
+method: PUT
+headers:
+  Authorization: Bearer {{accessToken}}
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "offerWeights": {
+        "entertainment": 5.0
+      }
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status code is 400", function () {
+          pm.response.to.have.status(400);
+      });
+
+      pm.test("Response has code field", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("code");
+      });
+
+      pm.test("Response has message field", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("message");
+      });
+
+      pm.test("Response time is under 2000ms", function () {
+          pm.expect(pm.response.responseTime).to.be.below(2000);
+      });
+    language: text/javascript
+examples: ./.resources/PUT -recommendations-configuration — Invalid Payload (400).resources/examples
+order: 4000

@@ -1,0 +1,40 @@
+$kind: http-request
+name: POST /reservations — Unauthorized (401)
+url: "{{baseUrl}}/reservations"
+method: POST
+description: |-
+  Negative test: sends a valid reservation payload with an empty `Authorization` header. Expects a 401 Unauthorized response with `code` and `message` fields. Validates that the reservations endpoint enforces authentication and returns a well-formed error when credentials are absent. Response time must be under 2000ms.
+headers:
+  Authorization: ""
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "propertyId": "GRAND-HOTEL-LV",
+      "roomTypeCode": "DELUXE-KING",
+      "ratePlanCode": "FLEX_RACK",
+      "checkIn": "2026-06-01",
+      "checkOut": "2026-06-03",
+      "guests": { "adults": 2 },
+      "payment": { "type": "CREDIT_CARD", "token": "tok_visa_4242" }
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status code is 401", function () {
+          pm.response.to.have.status(401);
+      });
+
+      pm.test("Response has code and message", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("code");
+          pm.expect(json).to.have.property("message");
+      });
+
+      pm.test("Response time is under 2000ms", function () {
+          pm.expect(pm.response.responseTime).to.be.below(2000);
+      });
+    language: text/javascript
+examples: ./.resources/POST -reservations — Unauthorized (401).resources/examples
+order: 3000

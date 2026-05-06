@@ -1,0 +1,15 @@
+$kind: http-example
+name: GET /health — Service Healthy
+request:
+  url: "{{baseUrl}}/health"
+  method: GET
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  body:
+    type: json
+    content: '{"status": "UP", "timestamp": "2026-05-05T22:40:00Z", "version": "2.4.1", "dependencies": {"database": {"status": "UP", "responseTimeMs": 4}, "cache": {"status": "UP", "responseTimeMs": 1}, "eventBus": {"status": "UP", "responseTimeMs": 7}}}'
+order: 1000

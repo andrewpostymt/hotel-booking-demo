@@ -1,0 +1,101 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/recommendations/configuration"
+  method: GET
+  headers:
+    - key: Accept
+      value: application/json
+    - key: Authorization
+      value: <token>
+      description: "Added as a part of security scheme: oauth2"
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "configVersion": "2026.04.29.001",
+        "lastUpdatedAt": "2014-06-15T13:04:44.651Z",
+        "offerWeights": {
+          "entertainment": 0.8543081186569397,
+          "dining": 0.917124575730283,
+          "resort_package": 0.21064722208570075
+        },
+        "lastUpdatedBy": "string",
+        "blackoutDates": [
+          "1974-05-17",
+          "1994-05-03"
+        ],
+        "propertyOverrides": {
+          "key_0": {
+            "showsOnlyEnabled": true
+          },
+          "key_1": {
+            "showsOnlyEnabled": false
+          }
+        }
+      }
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "configVersion": {
+            "type": "string",
+            "example": "2026.04.29.001",
+            "description": "Versioned configuration snapshot identifier"
+          },
+          "lastUpdatedBy": {
+            "type": "string",
+            "description": "Identity that last modified the configuration"
+          },
+          "lastUpdatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "offerWeights": {
+            "type": "object",
+            "description": "Relative scoring weights for offer categories (0.0–1.0)",
+            "properties": {
+              "entertainment": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1,
+                "format": "float"
+              },
+              "dining": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1,
+                "format": "float"
+              },
+              "resort_package": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1,
+                "format": "float"
+              }
+            }
+          },
+          "blackoutDates": {
+            "type": "array",
+            "description": "Dates on which recommendation engine output is suppressed",
+            "items": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          "propertyOverrides": {
+            "type": "object",
+            "description": "Per-property configuration overrides keyed by property code"
+          }
+        },
+        "required": [
+          "configVersion",
+          "lastUpdatedAt",
+          "offerWeights"
+        ]
+      }
+order: 1000

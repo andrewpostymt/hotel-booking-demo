@@ -1,0 +1,94 @@
+$kind: http-request
+name: GET /recommendations — Happy Path (3-night stay)
+url: "{{baseUrl}}/recommendations?orderId=ORD-2026-00124857&stayNights=3&propertyCode=ARIA&roomCount=1&showsOnly=false"
+method: GET
+headers:
+  Authorization: Bearer {{accessToken}}
+queryParams:
+  orderId: ORD-2026-00124857
+  stayNights: "3"
+  propertyCode: ARIA
+  roomCount: "1"
+  showsOnly: "false"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status code is 200", function () {
+          pm.response.to.have.status(200);
+      });
+
+      pm.test("Response has orderId", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("orderId");
+          pm.expect(json.orderId).to.be.a("string").and.not.empty;
+      });
+
+      pm.test("orderId matches request", function () {
+          const json = pm.response.json();
+          pm.expect(json.orderId).to.eql("ORD-2026-00124857");
+      });
+
+      pm.test("Response has recommendations array", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("recommendations");
+          pm.expect(json.recommendations).to.be.an("array");
+      });
+
+      pm.test("Response has generatedAt timestamp", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("generatedAt");
+          const date = new Date(json.generatedAt);
+          pm.expect(date.toString()).to.not.eql("Invalid Date");
+      });
+
+      pm.test("Response has totalCount", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("totalCount");
+          pm.expect(json.totalCount).to.be.a("number");
+      });
+
+      pm.test("totalCount matches recommendations array length", function () {
+          const json = pm.response.json();
+          pm.expect(json.totalCount).to.eql(json.recommendations.length);
+      });
+
+      pm.test("Each recommendation has required fields", function () {
+          const json = pm.response.json();
+          json.recommendations.forEach(function(rec) {
+              pm.expect(rec).to.have.property("offerId");
+              pm.expect(rec).to.have.property("offerType");
+              pm.expect(rec).to.have.property("title");
+              pm.expect(rec).to.have.property("price");
+              pm.expect(rec).to.have.property("currency");
+              pm.expect(rec).to.have.property("rank");
+          });
+      });
+
+      pm.test("offerType values are valid enum values", function () {
+          const json = pm.response.json();
+          const validTypes = ["entertainment", "dining", "resort_package", "room_upgrade", "transportation"];
+          json.recommendations.forEach(function(rec) {
+              pm.expect(validTypes).to.include(rec.offerType);
+          });
+      });
+
+      pm.test("rank values are positive integers", function () {
+          const json = pm.response.json();
+          json.recommendations.forEach(function(rec) {
+              pm.expect(rec.rank).to.be.a("number").and.to.be.at.least(1);
+          });
+      });
+
+      pm.test("price is a non-negative number", function () {
+          const json = pm.response.json();
+          json.recommendations.forEach(function(rec) {
+              pm.expect(rec.price).to.be.a("number").and.to.be.at.least(0);
+          });
+      });
+
+      pm.test("Response time is under 3000ms", function () {
+          pm.expect(pm.response.responseTime).to.be.below(3000);
+      });
+    language: text/javascript
+examples: ./.resources/GET -recommendations — Happy Path (3-night stay).resources/examples
+order: 1000

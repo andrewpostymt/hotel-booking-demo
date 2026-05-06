@@ -1,0 +1,27 @@
+$kind: http-request
+name: GET /reservations/{confirmationNumber} — Not Found (404)
+url: "{{baseUrl}}/reservations/HOTEL-NONEXISTENT-99999"
+method: GET
+description: |-
+  Negative test: attempts to retrieve a reservation using a hardcoded non-existent confirmation number (`HOTEL-NONEXISTENT-99999`). Expects a 404 Not Found response with `code` and `message` fields. Validates that the API returns a well-formed error when the confirmation number cannot be found. Response time must be under 2000ms.
+headers:
+  Authorization: Bearer {{accessToken}}
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status code is 404", function () {
+          pm.response.to.have.status(404);
+      });
+
+      pm.test("Response has code and message", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("code");
+          pm.expect(json).to.have.property("message");
+      });
+
+      pm.test("Response time is under 2000ms", function () {
+          pm.expect(pm.response.responseTime).to.be.below(2000);
+      });
+    language: text/javascript
+examples: ./.resources/GET -reservations-{confirmationNumber} — Not Found (404).resources/examples
+order: 5000

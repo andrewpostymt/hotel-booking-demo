@@ -1,0 +1,15 @@
+$kind: http-example
+name: GET /recommendations — Order Not Found (404)
+request:
+  url: "{{baseUrl}}/recommendations"
+  method: GET
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 404
+  statusText: Not Found
+  body:
+    type: json
+    content: "{\"code\": \"ORDER_NOT_FOUND\", \"message\": \"No order found with orderId 'ORD-NONEXISTENT-99999'.\"}"
+order: 1000

@@ -1,0 +1,27 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/reservations"
+  method: POST
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "propertyId": "GRAND-HOTEL-LV",
+        "roomTypeCode": "DELUXE-KING",
+        "ratePlanCode": "FLEX_RACK",
+        "checkIn": "2026-06-01",
+        "checkOut": "2026-06-03",
+        "guests": { "adults": 2 },
+        "payment": { "type": "CREDIT_CARD", "token": "tok_visa_4242" }
+      }
+response:
+  statusCode: 401
+  statusText: Unauthorized
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: '{"error":"UNAUTHORIZED","message":"Missing or invalid authorization token"}'
+order: 1000

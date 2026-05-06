@@ -1,0 +1,33 @@
+$kind: http-request
+name: GET /availability/trip — With Room Type Filter
+url: "{{baseUrl}}/availability/trip?propertyId=GRAND-HOTEL-LV&checkIn=2026-06-01&checkOut=2026-06-03&adults=2&roomTypeCode=DELUXE-KING"
+method: GET
+description: |-
+  Extends the happy-path trip request by adding the optional `roomTypeCode=DELUXE-KING` query parameter. Verifies the API accepts the filter and returns a valid response with `propertyId` and a `rooms` array. Useful for confirming that room-type-specific availability filtering is supported. Response time must be under 3000ms.
+headers:
+  Authorization: Bearer {{accessToken}}
+queryParams:
+  propertyId: GRAND-HOTEL-LV
+  checkIn: '2026-06-01'
+  checkOut: '2026-06-03'
+  adults: "2"
+  roomTypeCode: DELUXE-KING
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status code is 200", function () {
+          pm.response.to.have.status(200);
+      });
+
+      pm.test("Response structure is valid", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("propertyId");
+          pm.expect(json).to.have.property("rooms");
+      });
+
+      pm.test("Response time is under 3000ms", function () {
+          pm.expect(pm.response.responseTime).to.be.below(3000);
+      });
+    language: text/javascript
+examples: ./.resources/GET -availability-trip — With Room Type Filter.resources/examples
+order: 6000

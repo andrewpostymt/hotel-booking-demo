@@ -1,0 +1,4 @@
+$kind: collection
+description: |-
+  Connectivity and liveness checks for the room-booking-core-services API. Run these first in any collection run to confirm the service is reachable and reporting a healthy status before executing downstream availability, pricing, or reservation requests. The health endpoint requires no authentication and returns service version, uptime percentage, and dependency statuses for database, cache, and payment gateway.
+order: 1000

@@ -1,0 +1,18 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/availability/grid"
+  method: GET
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: '{"checkIn":"2026-06-01","checkOut":"2026-06-03","adults":2,"nights":2,"properties":[{"propertyId":"GRAND-HOTEL-LV","propertyName":"Grand Hotel Las Vegas","available":true,"lowestTotalRate":{"amount":578.00,"currency":"USD"},"roomTypes":[{"roomTypeCode":"DELUXE-KING","available":true,"totalRate":{"amount":578.00,"currency":"USD"}}]},{"propertyId":"PALACE-HOTEL-LV","propertyName":"Palace Hotel Las Vegas","available":true,"lowestTotalRate":{"amount":698.00,"currency":"USD"},"roomTypes":[{"roomTypeCode":"DELUXE-KING","available":true,"totalRate":{"amount":698.00,"currency":"USD"}}]},{"propertyId":"SUMMIT-HOTEL-LV","propertyName":"Summit Hotel Las Vegas","available":false,"lowestTotalRate":null,"roomTypes":[]}]}'
+order: 1000

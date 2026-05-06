@@ -1,0 +1,18 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/pricing/customer-credit"
+  method: GET
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: '{"mlifeNumber":"MLF-8823491","propertyId":"GRAND-HOTEL-LV","checkIn":"2026-06-01","checkOut":"2026-06-03","memberTier":"GOLD","creditBalance":{"amount":150.00,"currency":"USD"},"applicableCredit":{"amount":100.00,"currency":"USD"},"expiresAt":"2026-12-31"}'
+order: 1000

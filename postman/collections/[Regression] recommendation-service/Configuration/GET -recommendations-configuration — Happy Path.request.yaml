@@ -1,0 +1,46 @@
+$kind: http-request
+name: GET /recommendations/configuration — Happy Path
+url: "{{baseUrl}}/recommendations/configuration"
+method: GET
+headers:
+  Authorization: Bearer {{accessToken}}
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status code is 200", function () {
+          pm.response.to.have.status(200);
+      });
+
+      pm.test("Response has configVersion", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("configVersion");
+          pm.expect(json.configVersion).to.be.a("string").and.not.empty;
+      });
+
+      pm.test("Response has lastUpdatedAt", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("lastUpdatedAt");
+          const date = new Date(json.lastUpdatedAt);
+          pm.expect(date.toString()).to.not.eql("Invalid Date");
+      });
+
+      pm.test("Response has offerWeights", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("offerWeights");
+          pm.expect(json.offerWeights).to.be.an("object");
+      });
+
+      pm.test("offerWeights values are between 0 and 1", function () {
+          const json = pm.response.json();
+          const weights = json.offerWeights;
+          Object.values(weights).forEach(function(w) {
+              pm.expect(w).to.be.at.least(0).and.at.most(1);
+          });
+      });
+
+      pm.test("Response time is under 2000ms", function () {
+          pm.expect(pm.response.responseTime).to.be.below(2000);
+      });
+    language: text/javascript
+examples: ./.resources/GET -recommendations-configuration — Happy Path.resources/examples
+order: 1000

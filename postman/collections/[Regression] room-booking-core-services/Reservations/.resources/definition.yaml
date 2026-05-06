@@ -1,0 +1,10 @@
+$kind: collection
+description: |-
+  Regression scenarios for the full reservation lifecycle: create, retrieve, modify, and cancel. Covers the happy-path CRUD flow as well as error cases for missing payment (400), unauthorized access (401), and unknown confirmation numbers (404). The create request stores `confirmationNumber` in the environment for use by subsequent retrieve, modify, and cancel requests — run this folder in order for the chained flow to work correctly.
+
+  **Endpoints covered:**
+  - `POST /reservations` — Create a new reservation; stores `confirmationNumber` in environment on 201
+  - `GET /reservations/{confirmationNumber}` — Retrieve reservation details by confirmation number
+  - `PUT /reservations/{confirmationNumber}` — Modify dates, room type, or guest count on an existing reservation
+  - `DELETE /reservations/{confirmationNumber}` — Cancel a reservation; returns refund or penalty details
+order: 4000

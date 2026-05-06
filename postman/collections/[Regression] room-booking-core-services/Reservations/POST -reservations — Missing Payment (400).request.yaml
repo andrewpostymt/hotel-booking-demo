@@ -1,0 +1,41 @@
+$kind: http-request
+name: POST /reservations — Missing Payment (400)
+url: "{{baseUrl}}/reservations"
+method: POST
+description: |-
+  Negative test: submits a reservation request with all required booking fields but omits the `payment` object entirely. Expects a 400 Bad Request with `code` and `message` fields. Validates that the API enforces payment as a required field and returns a well-formed error response. Response time must be under 2000ms.
+headers:
+  Authorization: Bearer {{accessToken}}
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "propertyId": "GRAND-HOTEL-LV",
+      "roomTypeCode": "DELUXE-KING",
+      "ratePlanCode": "FLEX_RACK",
+      "checkIn": "2026-06-01",
+      "checkOut": "2026-06-03",
+      "guests": {
+        "adults": 2
+      }
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status code is 400", function () {
+          pm.response.to.have.status(400);
+      });
+
+      pm.test("Response has code and message", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("code");
+          pm.expect(json).to.have.property("message");
+      });
+
+      pm.test("Response time is under 2000ms", function () {
+          pm.expect(pm.response.responseTime).to.be.below(2000);
+      });
+    language: text/javascript
+examples: ./.resources/POST -reservations — Missing Payment (400).resources/examples
+order: 2000

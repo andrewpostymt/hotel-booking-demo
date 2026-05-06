@@ -1,0 +1,31 @@
+$kind: http-request
+name: GET /recommendations — Missing orderId (400)
+url: "{{baseUrl}}/recommendations"
+method: GET
+headers:
+  Authorization: Bearer {{accessToken}}
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status code is 400", function () {
+          pm.response.to.have.status(400);
+      });
+
+      pm.test("Response has code field", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("code");
+          pm.expect(json.code).to.be.a("string").and.not.empty;
+      });
+
+      pm.test("Response has message field", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("message");
+          pm.expect(json.message).to.be.a("string").and.not.empty;
+      });
+
+      pm.test("Response time is under 2000ms", function () {
+          pm.expect(pm.response.responseTime).to.be.below(2000);
+      });
+    language: text/javascript
+examples: ./.resources/GET -recommendations — Missing orderId (400).resources/examples
+order: 3000
