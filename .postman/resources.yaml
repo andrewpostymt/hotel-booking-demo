@@ -1,5 +1,5 @@
 workspace:
-  id: 8efae25c-c592-46ce-89f7-7102faef61e8
+  id: "8efae25c-c592-46ce-89f7-7102faef61e8"
 
 localResources:
   collections:
@@ -15,11 +15,16 @@ localResources:
     - ../postman/environments/room-booking-core-services - dev.environment.yaml
     - ../postman/environments/room-booking-core-services - qa2.environment.yaml
     - ../postman/environments/room-booking-core-services - qa4.environment.yaml
-    - ../postman/environments/room-booking-core-services - preprod.environment.yaml
-    - ../postman/environments/room-booking-core-services - nonprod-dev.environment.yaml
-    - ../postman/environments/room-booking-core-services - nonprod-qa.environment.yaml
-    - ../postman/environments/room-booking-core-services - nonprod-stage.environment.yaml
-    - ../postman/environments/room-booking-core-services - nonprod-preprod.environment.yaml
+    - ../postman/environments/room-booking-core-services -
+      preprod.environment.yaml
+    - ../postman/environments/room-booking-core-services -
+      nonprod-dev.environment.yaml
+    - ../postman/environments/room-booking-core-services -
+      nonprod-qa.environment.yaml
+    - ../postman/environments/room-booking-core-services -
+      nonprod-stage.environment.yaml
+    - ../postman/environments/room-booking-core-services -
+      nonprod-preprod.environment.yaml
   specs:
     - ../room-booking-core-services.openapi.yaml
     - ../recommendation-service.openapi.yaml

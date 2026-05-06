@@ -1,24 +1,16 @@
 name: room-booking-core-services - dev
 values:
   - key: baseUrl
-    value: https://53e2d511-c77e-464c-a0d4-9e69793dfcc1.mock.pstmn.io
-    enabled: true
+    value: 'https://53e2d511-c77e-464c-a0d4-9e69793dfcc1.mock.pstmn.io'
   - key: CI
-    value: "true"
-    enabled: true
+    value: 'true'
   - key: RESPONSE_TIME_THRESHOLD
-    value: "2000"
-    enabled: true
+    value: '2000'
   - key: AWS_ACCESS_KEY_ID
-    value: ""
-    enabled: true
+    value: ''
   - key: AWS_SECRET_ACCESS_KEY
-    value: ""
-    enabled: true
+    value: ''
   - key: AWS_REGION
     value: eu-west-2
-    enabled: true
   - key: AWS_SECRET_NAME
     value: api-credentials-dev
-    enabled: true
-color: null

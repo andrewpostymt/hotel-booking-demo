@@ -1,4 +1,4 @@
-type: http
+$kind: http-request
 name: Cancel reservation
 url: '{{baseUrl}}/reservations/:confirmationNumber?reason=WEATHER'
 method: DELETE

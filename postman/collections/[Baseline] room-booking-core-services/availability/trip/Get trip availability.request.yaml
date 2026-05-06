@@ -1,4 +1,4 @@
-type: http
+$kind: http-request
 name: Get trip availability
 url: '{{baseUrl}}/availability/trip?propertyId=GRAND-HOTEL-LV&checkIn=2026-06-01&checkOut=2026-06-03&adults=2&children=0&roomTypeCode=DELUXE-KING'
 method: GET

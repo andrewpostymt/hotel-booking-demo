@@ -1,4 +1,4 @@
-type: http
+$kind: http-request
 name: Get room availability calendar
 url: '{{baseUrl}}/availability/calendar?propertyId=GRAND-HOTEL-LV&checkIn=2026-06-01&checkOut=2026-06-03&adults=2&children=0&ratePlanCode=FLEX_RACK&lengthOfStay=2'
 method: GET

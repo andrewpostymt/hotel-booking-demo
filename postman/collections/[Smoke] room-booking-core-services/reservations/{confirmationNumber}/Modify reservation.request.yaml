@@ -1,4 +1,4 @@
-type: http
+$kind: http-request
 name: Modify reservation
 url: '{{baseUrl}}/reservations/:confirmationNumber'
 method: PUT

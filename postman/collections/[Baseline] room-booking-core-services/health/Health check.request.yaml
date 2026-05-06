@@ -1,4 +1,4 @@
-type: http
+$kind: http-request
 name: Health check
 url: '{{baseUrl}}/health'
 method: GET

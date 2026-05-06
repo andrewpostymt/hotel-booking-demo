@@ -1,4 +1,4 @@
-type: http
+$kind: http-request
 name: Create reservation
 url: '{{baseUrl}}/reservations'
 method: POST

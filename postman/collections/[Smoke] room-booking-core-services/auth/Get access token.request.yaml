@@ -1,4 +1,4 @@
-type: http
+$kind: http-request
 name: Get access token
 url: '{{baseUrl}}/auth/token'
 method: POST

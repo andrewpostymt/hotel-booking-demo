@@ -1,4 +1,4 @@
-type: http
+$kind: http-request
 name: Retrieve reservation
 url: '{{baseUrl}}/reservations/:confirmationNumber'
 method: GET

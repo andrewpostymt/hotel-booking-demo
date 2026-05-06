@@ -1,4 +1,4 @@
-type: http
+$kind: http-request
 name: Get customer credit calendar
 url: '{{baseUrl}}/pricing/customer-credit?propertyId=GRAND-HOTEL-LV&checkIn=2026-06-01&checkOut=2026-06-03&mlifeNumber=MLF-8823491&ratePlanCode=MLIFE-MEMBER'
 method: GET
