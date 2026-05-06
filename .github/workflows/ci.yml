@@ -56,7 +56,7 @@ jobs:
           environments = cloud.fetch('environments', {})
           smoke = collections.find { |path, _| path.include?('[Smoke]') }&.last
           contract = collections.find { |path, _| path.include?('[Contract]') }&.last
-          environment = environments.find { |path, _| path.end_with?('/dev.postman_environment.json') }&.last || environments.values.first
+          environment = environments.find { |path, _| path.include?('- dev.environment') }&.last || environments.values.first
           missing = []
           missing << 'smoke collection' unless smoke
           missing << 'contract collection' unless contract

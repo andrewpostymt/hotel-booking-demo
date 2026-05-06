@@ -6,34 +6,47 @@ localResources:
     - ../postman/collections/[Baseline] room-booking-core-services
     - ../postman/collections/[Smoke] room-booking-core-services
     - ../postman/collections/[Contract] room-booking-core-services
-  environments: []
+    - ../postman/collections/[Regression] room-booking-core-services
+    - ../postman/collections/[Baseline] recommendation-service
+    - ../postman/collections/[Smoke] recommendation-service
+    - ../postman/collections/[Contract] recommendation-service
+    - ../postman/collections/[Regression] recommendation-service
+  environments:
+    - ../postman/environments/room-booking-core-services - dev.environment.yaml
+    - ../postman/environments/room-booking-core-services - qa2.environment.yaml
+    - ../postman/environments/room-booking-core-services - qa4.environment.yaml
+    - ../postman/environments/room-booking-core-services - preprod.environment.yaml
+    - ../postman/environments/room-booking-core-services - nonprod-dev.environment.yaml
+    - ../postman/environments/room-booking-core-services - nonprod-qa.environment.yaml
+    - ../postman/environments/room-booking-core-services - nonprod-stage.environment.yaml
+    - ../postman/environments/room-booking-core-services - nonprod-preprod.environment.yaml
   specs:
     - ../room-booking-core-services.openapi.yaml
+    - ../recommendation-service.openapi.yaml
     - ../entertainment-nightlife-reservations.openapi.yaml
-    - ../index.yaml
 
 # Each entry here maps a local resource to one or more corresponding objects in Postman Cloud
 
 cloudResources:
   collections:
-    ../postman/collections/[Baseline] recommendation-service: 54514825-38da95bf-b87b-4c11-810b-f4300d961426
-    ../postman/collections/[Smoke] recommendation-service: 54514825-59c00786-dd6c-4b68-8ca4-118075ca0313
+    ../postman/collections/[Baseline] room-booking-core-services: 54514825-fc7f807e-0fbc-453b-acca-6c5b1265cf9a
     ../postman/collections/[Smoke] room-booking-core-services: 54514825-74e7fe5f-a806-4013-b834-292011e2794b
     ../postman/collections/[Contract] room-booking-core-services: 54514825-7e1135f7-c548-48a4-913a-7468e9e329a0
     ../postman/collections/[Regression] room-booking-core-services: 54514825-a9683e5c-4034-4b34-b82e-f9d3a51dd54b
-    ../postman/collections/[Regression] recommendation-service: 54514825-ab3e5035-2b51-4cc0-b32c-63a88c6ccf7d
+    ../postman/collections/[Baseline] recommendation-service: 54514825-38da95bf-b87b-4c11-810b-f4300d961426
+    ../postman/collections/[Smoke] recommendation-service: 54514825-59c00786-dd6c-4b68-8ca4-118075ca0313
     ../postman/collections/[Contract] recommendation-service: 54514825-c59d7657-cae6-4af7-9a49-0fd45bc4e05e
-    ../postman/collections/[Baseline] room-booking-core-services: 54514825-fc7f807e-0fbc-453b-acca-6c5b1265cf9a
+    ../postman/collections/[Regression] recommendation-service: 54514825-ab3e5035-2b51-4cc0-b32c-63a88c6ccf7d
   environments:
-    ../postman/environments/room-booking-core-services - nonprod-dev.environment.yaml: 54514825-01c35951-1bfc-459b-a891-66b33b007866
-    ../postman/environments/room-booking-core-services - nonprod-preprod.environment.yaml: 54514825-11cc72bf-04d2-4d0f-baba-5bbb41e6bc33
-    ../postman/environments/room-booking-core-services - preprod.environment.yaml: 54514825-5cf52355-675b-4388-a812-ed13aaa84a4b
-    ../postman/environments/room-booking-core-services - qa2.environment.yaml: 54514825-8ad55274-4f94-4631-8232-31a176d623a0
-    ../postman/environments/room-booking-core-services - nonprod-qa.environment.yaml: 54514825-924abd1a-e366-4b9f-8d6d-a69d933a5e83
     ../postman/environments/room-booking-core-services - dev.environment.yaml: 54514825-9c5d6d2d-9de1-4669-9140-89b894a6929a
-    ../postman/environments/room-booking-core-services - nonprod-stage.environment.yaml: 54514825-bcffb744-4946-485d-8b34-5ee835b89b3c
+    ../postman/environments/room-booking-core-services - qa2.environment.yaml: 54514825-8ad55274-4f94-4631-8232-31a176d623a0
     ../postman/environments/room-booking-core-services - qa4.environment.yaml: 54514825-f408c436-7f9b-426d-a178-b542658255e1
+    ../postman/environments/room-booking-core-services - preprod.environment.yaml: 54514825-5cf52355-675b-4388-a812-ed13aaa84a4b
+    ../postman/environments/room-booking-core-services - nonprod-dev.environment.yaml: 54514825-01c35951-1bfc-459b-a891-66b33b007866
+    ../postman/environments/room-booking-core-services - nonprod-qa.environment.yaml: 54514825-924abd1a-e366-4b9f-8d6d-a69d933a5e83
+    ../postman/environments/room-booking-core-services - nonprod-stage.environment.yaml: 54514825-bcffb744-4946-485d-8b34-5ee835b89b3c
+    ../postman/environments/room-booking-core-services - nonprod-preprod.environment.yaml: 54514825-11cc72bf-04d2-4d0f-baba-5bbb41e6bc33
   specs:
     ../room-booking-core-services.openapi.yaml: 3fee126f-1d8a-469f-a676-9f12d4b16c1d
+    ../recommendation-service.openapi.yaml: 2403a4c0-cce0-4647-9d6b-81c2890a7b5b
     ../entertainment-nightlife-reservations.openapi.yaml: 5372c7c8-b34f-49bb-acc9-beebfbc777ec
-    ../index.yaml: 2403a4c0-cce0-4647-9d6b-81c2890a7b5b
