@@ -1,14 +1,49 @@
 $kind: collection
 description: |-
-  Cross-sell and upsell recommendation engine for the room booking flow.
-  Returns personalized offers based on order context, stay parameters, and guest preferences.
-  Integrates with the room booking service to surface additional revenue opportunities
-  post-booking and at key funnel steps.
+  # [Contract] recommendation-service
 
+  **Owner**: Room Booking Services Team (api-team@example-hospitality.com | #booking-platform-eng)
+  **Status**: Stable
+  **Last Updated**: 2026-05-05
 
-  Contact Support:
-   Name: Room Booking Services Team
-   Email: api-team@example-hospitality.com
+  ## Purpose
+
+  Core API services for the hotel room booking platform. Used by front-end booking flows, internal platform services, and CI/CD pipelines to validate availability, pricing, reservations, and cross-sell recommendations across all property environments.
+
+  ## Quick Start
+
+  1. Select the appropriate environment (dev → nonprod-preprod)
+  2. Authenticate using OAuth2 client credentials via the Resolve Secrets request or your environment's pre-wired token
+  3. Run a health check to verify connectivity
+  4. Browse the endpoints below for your first real request
+
+  ## Authentication
+
+  **Type**: OAuth 2.0 Client Credentials
+
+  Credentials are resolved from AWS Secrets Manager (`api-credentials-{env}`) at runtime. In CI, the `CI=true` environment variable bypasses the secrets fetch and uses the mock server directly.
+
+  ## Endpoints Overview
+
+  | Method | Endpoint | Description |
+  |--------|----------|-------------|
+  | POST | /auth/token | Issues an OAuth2 client credentials access token for authenticating |
+  | GET | /health | Returns the operational status of the recommendation service and its |
+  | POST | /recommendations/event-stays | Submit event-linked room stay preferences |
+  | GET | /recommendations/configuration | Returns the current configuration state of the recommendation engine, |
+  | PUT | /recommendations/configuration | Applies configuration overrides to the live recommendation engine. |
+  | GET | /recommendations | Returns a ranked list of cross-sell and upsell offers for a given order context. |
+  | POST | / | 00 - Resolve Secrets |
+
+  ## Lifecycle
+
+  **Stable** — Production-ready, follows semantic versioning.
+
+  Breaking changes announced via workspace updates with 30 days notice.
+
+  ## Support
+
+  Questions? Contact Room Booking Services Team at api-team@example-hospitality.com or #booking-platform-eng.
 variables:
   baseUrl: https://recommendation-dev.example-hospitality.com
 auth:

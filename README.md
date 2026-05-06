@@ -178,6 +178,43 @@ This action:
 
 **Note**: Use `@main`, not `@v0`. The `v0` tag does not support async collection generation.
 
+### `postman-cs/postman-repo-sync-action`
+
+Runs after bootstrap to materialise the workspace into the repository and keep it continuously in sync.
+
+What it handles:
+
+**Workspace linking** — Registers the GitHub repository URL against the Postman workspace via the Bifrost integration backend. This surfaces the repo link in the workspace UI so consumers can navigate directly from a collection to its source.
+
+**Environment provisioning** — Creates or updates Postman environments for each deployment tier defined in `environments-json`. Maps each environment slug to a system environment ID and runtime base URL, so environment variables are resolved correctly per tier without manual configuration.
+
+**Mock server** — Creates a mock server linked to the Baseline collection and writes the resulting URL back into the appropriate environment files. Subsequent runs reuse the existing mock if a valid `mock-url` is supplied.
+
+**Monitor creation** — Creates a cloud monitor targeting the Smoke collection on the configured cron schedule (e.g. `0 */6 * * *`). The monitor runs independently of the CI pipeline and surfaces results in the Postman workspace dashboard. Can be set to `cli` mode to skip cloud monitor creation and rely solely on the CI pipeline instead.
+
+**Artifact export and repo commit** — Exports the Baseline and Contract collections and all environments as YAML into the `postman/` directory, then commits and pushes the result back to the branch. This keeps the repository in sync with Postman Cloud without manual `workspace push` operations.
+
+**Collection and spec lifecycle** — Supports `refresh` mode (overwrite in place) or `version` mode (create a new named version) for both collections and specs. Used to control how breaking changes are propagated.
+
+```yaml
+- uses: postman-cs/postman-repo-sync-action@main
+  with:
+    project-name: room-booking-core-services
+    workspace-id: <workspace-id>
+    baseline-collection-id: <baseline-collection-id>
+    smoke-collection-id: <smoke-collection-id>
+    contract-collection-id: <contract-collection-id>
+    spec-id: <spec-id>
+    environments-json: '["dev","qa2","qa4","preprod","nonprod-dev","nonprod-qa","nonprod-stage","nonprod-preprod"]'
+    monitor-cron: '0 */6 * * *'
+    generate-ci-workflow: 'false'
+    postman-api-key: ${{ secrets.POSTMAN_API_KEY }}
+    postman-access-token: ${{ secrets.POSTMAN_ACCESS_TOKEN }}
+    github-token: ${{ secrets.GITHUB_TOKEN }}
+```
+
+**Note**: Set `generate-ci-workflow: 'false'` to prevent the action from overwriting the custom `ci.yml`. The action defaults to generating its own CI workflow file.
+
 ---
 
 ## Secrets Required
@@ -186,6 +223,47 @@ This action:
 |--------|-------|
 | `POSTMAN_API_KEY` | Authenticates the Postman CLI for all `postman` commands |
 | `POSTMAN_ACCESS_TOKEN` | Required by the bootstrap action for workspace and governance operations |
+
+---
+
+## Example Developer Workflow
+
+The following describes how a developer working on a hotel platform API would interact with this system from a feature branch through to production readiness.
+
+**1. Local development**
+
+The developer opens the Postman desktop app in Local Mode. The workspace is connected to this repository, so all collections, environments, and specs are available locally as v3 YAML. They select the `dev` environment, which points to the mock server, and explore the existing requests before making changes.
+
+**2. Spec-first change**
+
+The developer updates `room-booking-core-services.openapi.yaml` to add a new field or endpoint. In the desktop app, the spec-to-collection link triggers a prompt to regenerate the linked Baseline, Smoke, and Contract collections. They review the generated requests, add representative example responses to the Baseline for mock coverage, and write test assertions in the Contract collection.
+
+**3. Push to feature branch**
+
+The developer runs `postman workspace push` to sync local changes to Postman Cloud, then commits the updated YAML files and opens a pull request against `main`.
+
+**4. CI runs automatically**
+
+On the pull request, the CI pipeline executes:
+- **Governance** — `postman spec lint` validates the spec against the team's ruleset in Postman Cloud. Any violations block the merge.
+- **Smoke tests** — a fast sanity check across critical paths, running against the `dev` environment (mock server).
+- **Contract tests** — schema and response contract assertions validate that the implementation matches the spec.
+
+The developer can see pass/fail status directly in the GitHub pull request checks, and full run history in the Postman workspace.
+
+**5. Merge and promotion**
+
+Once the pull request is approved and CI passes, it merges to `main`. The repo-sync action updates the Postman workspace, refreshes environment configurations for the next tier (`qa2`), and the cloud monitor picks up the new smoke collection on its next scheduled run.
+
+The same CI pipeline runs on merge, this time targeting `nonprod-qa`, giving the team an automated gate before any change reaches the shared QA environment.
+
+**6. Pre-release validation**
+
+Before a release to `preprod`, the Regression collection is run manually or as a scheduled job against `nonprod-stage`. This full suite covers happy-path and error-path scenarios across all endpoints. Credentials are resolved from AWS Secrets Manager at runtime — no tokens are stored in the repo.
+
+**7. Ongoing monitoring**
+
+The cloud monitor runs the Smoke collection against `nonprod-qa` every 6 hours. Failures surface in the Postman workspace dashboard and can be configured to alert via webhook. The scheduled CI run provides a parallel signal from within the GitHub Actions environment.
 
 ---
 

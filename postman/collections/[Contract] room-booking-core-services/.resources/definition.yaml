@@ -1,7 +1,53 @@
 $kind: collection
 description: |-
-  Core services for the room booking flow across hotel properties.
-  Covers pricing, availability, reservations, and customer credit.
+  # [Contract] room-booking-core-services
+
+  **Owner**: Room Booking Services Team (api-team@example-hospitality.com | #booking-platform-eng)
+  **Status**: Stable
+  **Last Updated**: 2026-05-05
+
+  ## Purpose
+
+  Core API services for the hotel room booking platform. Used by front-end booking flows, internal platform services, and CI/CD pipelines to validate availability, pricing, reservations, and cross-sell recommendations across all property environments.
+
+  ## Quick Start
+
+  1. Select the appropriate environment (dev → nonprod-preprod)
+  2. Authenticate using OAuth2 client credentials via the Resolve Secrets request or your environment's pre-wired token
+  3. Run a health check to verify connectivity
+  4. Browse the endpoints below for your first real request
+
+  ## Authentication
+
+  **Type**: OAuth 2.0 Client Credentials
+
+  Credentials are resolved from AWS Secrets Manager (`api-credentials-{env}`) at runtime. In CI, the `CI=true` environment variable bypasses the secrets fetch and uses the mock server directly.
+
+  ## Endpoints Overview
+
+  | Method | Endpoint | Description |
+  |--------|----------|-------------|
+  | GET | /availability/calendar | Returns room pricing and availability for each day in a requested calendar period. |
+  | GET | /availability/grid | Returns a matrix of room availability across multiple properties and date combinations |
+  | GET | /availability/trip | Returns room pricing and availability for a specific trip — a defined check-in date, |
+  | GET | /health | Returns the health status of the Room Booking Core Services API. Used by CI/CD pipeline smoke tests and monitoring. |
+  | GET | /pricing/customer-credit | Returns M life Rewards credit eligibility and accrual rates for a specific guest |
+  | GET | /pricing/rate-plans | Returns available rate plans for a property and date range, including eligibility |
+  | POST | /pricing/room-charges | Calculates the full room charge breakdown for a proposed booking including base rate, |
+  | GET | /reservations/:confirmationNumber | Returns a full reservation record by confirmation number. Used by the booking confirmation page, guest service agents, and CI/CD integration test suites. |
+  | PUT | /reservations/:confirmationNumber | Modifies an existing reservation. Supports date changes, room type upgrades, |
+  | DELETE | /reservations/:confirmationNumber | Cancels a reservation by confirmation number. Applies the cancellation policy |
+  | POST | /reservations | Creates a new room reservation. Accepts a fully validated booking payload including |
+
+  ## Lifecycle
+
+  **Stable** — Production-ready, follows semantic versioning.
+
+  Breaking changes announced via workspace updates with 30 days notice.
+
+  ## Support
+
+  Questions? Contact Room Booking Services Team at api-team@example-hospitality.com or #booking-platform-eng.
 variables:
   baseUrl: https://dev-api.example-hospitality.com/room-booking/v3
 auth:

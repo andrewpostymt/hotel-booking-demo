@@ -1,4 +1,59 @@
 $kind: collection
+description: |-
+  # [Regression] recommendation-service
+
+  **Owner**: Room Booking Services Team (api-team@example-hospitality.com | #booking-platform-eng)
+  **Status**: Stable
+  **Last Updated**: 2026-05-05
+
+  ## Purpose
+
+  Core API services for the hotel room booking platform. Used by front-end booking flows, internal platform services, and CI/CD pipelines to validate availability, pricing, reservations, and cross-sell recommendations across all property environments.
+
+  ## Quick Start
+
+  1. Select the appropriate environment (dev → nonprod-preprod)
+  2. Authenticate using OAuth2 client credentials via the Resolve Secrets request or your environment's pre-wired token
+  3. Run a health check to verify connectivity
+  4. Browse the endpoints below for your first real request
+
+  ## Authentication
+
+  **Type**: OAuth 2.0 Client Credentials
+
+  Credentials are resolved from AWS Secrets Manager (`api-credentials-{env}`) at runtime. In CI, the `CI=true` environment variable bypasses the secrets fetch and uses the mock server directly.
+
+  ## Endpoints Overview
+
+  | Method | Endpoint | Description |
+  |--------|----------|-------------|
+  | POST | /auth/token | POST /auth/token — Happy Path |
+  | POST | /auth/token | POST /auth/token — Invalid Credentials (401) |
+  | GET | /health | GET /health — Service Healthy |
+  | GET | /recommendations | GET /recommendations — Happy Path (3-night stay) |
+  | GET | /recommendations | GET /recommendations — Shows Only Filter |
+  | GET | /recommendations | GET /recommendations — Missing orderId (400) |
+  | GET | /recommendations | GET /recommendations — Unauthorized (401) |
+  | GET | /recommendations | GET /recommendations — Order Not Found (404) |
+  | GET | /recommendations | GET /recommendations — Single Night Stay |
+  | POST | /recommendations/event-stays | POST /recommendations/event-stays — Happy Path |
+  | POST | /recommendations/event-stays | POST /recommendations/event-stays — Second Event (Upscale Funk) |
+  | POST | /recommendations/event-stays | POST /recommendations/event-stays — Missing Required Fields (400) |
+  | GET | /recommendations/configuration | GET /recommendations/configuration — Happy Path |
+  | GET | /recommendations/configuration | GET /recommendations/configuration — Unauthorized (401) |
+  | PUT | /recommendations/configuration | PUT /recommendations/configuration — Boost Entertainment |
+  | PUT | /recommendations/configuration | PUT /recommendations/configuration — Invalid Payload (400) |
+  | PUT | /recommendations/configuration | PUT /recommendations/configuration — Unauthorized (401) |
+
+  ## Lifecycle
+
+  **Stable** — Production-ready, follows semantic versioning.
+
+  Breaking changes announced via workspace updates with 30 days notice.
+
+  ## Support
+
+  Questions? Contact Room Booking Services Team at api-team@example-hospitality.com or #booking-platform-eng.
 scripts:
   - type: http:beforeRequest
     code: |-
