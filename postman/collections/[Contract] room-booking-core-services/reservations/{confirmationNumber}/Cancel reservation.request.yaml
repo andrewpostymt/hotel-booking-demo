@@ -1,10 +1,8 @@
 $kind: http-request
-name: Cancel reservation
 url: '{{baseUrl}}/reservations/:confirmationNumber?reason=WEATHER'
 method: DELETE
 headers:
-  - key: Accept
-    value: application/json
+  Accept: application/json
 queryParams:
   - key: reason
     value: WEATHER

@@ -1,4 +1,0 @@
-type: folder
-name: calendar
-items:
-  - ref: ./Get room availability calendar.request.yaml

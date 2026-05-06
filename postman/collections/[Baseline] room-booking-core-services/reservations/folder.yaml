@@ -1,5 +1,0 @@
-type: folder
-name: reservations
-items:
-  - ref: ./{confirmationNumber}/folder.yaml
-  - ref: ./Create reservation.request.yaml

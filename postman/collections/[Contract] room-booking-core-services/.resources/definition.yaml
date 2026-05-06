@@ -1,0 +1,13 @@
+$kind: collection
+description: |-
+  Core services for the room booking flow across hotel properties.
+  Covers pricing, availability, reservations, and customer credit.
+variables:
+  baseUrl: https://dev-api.example-hospitality.com/room-booking/v3
+auth:
+  - type: oauth2
+    name: oauth2 auth
+    credentials:
+      scope: room-booking:read room-booking:write
+      accessTokenUrl: /auth/token
+      grant_type: client_credentials

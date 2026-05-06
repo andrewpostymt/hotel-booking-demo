@@ -1,4 +1,0 @@
-type: folder
-name: room-charges
-items:
-  - ref: ./Calculate room charges.request.yaml

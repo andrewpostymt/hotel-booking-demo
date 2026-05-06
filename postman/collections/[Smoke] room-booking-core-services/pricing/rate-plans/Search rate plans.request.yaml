@@ -1,10 +1,8 @@
 $kind: http-request
-name: Search rate plans
 url: '{{baseUrl}}/pricing/rate-plans?propertyId=GRAND-HOTEL-LV&checkIn=2026-06-01&checkOut=2026-06-03&segment=CORPORATE'
 method: GET
 headers:
-  - key: Accept
-    value: application/json
+  Accept: application/json
 queryParams:
   - key: propertyId
     value: GRAND-HOTEL-LV

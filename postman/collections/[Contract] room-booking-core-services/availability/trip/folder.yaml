@@ -1,4 +1,0 @@
-type: folder
-name: trip
-items:
-  - ref: ./Get trip availability.request.yaml

@@ -1,12 +1,9 @@
 $kind: http-request
-name: Calculate room charges
 url: '{{baseUrl}}/pricing/room-charges'
 method: POST
 headers:
-  - key: Content-Type
-    value: application/json
-  - key: Accept
-    value: application/json
+  Content-Type: application/json
+  Accept: application/json
 body:
   type: json
   content: |-

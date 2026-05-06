@@ -1,4 +1,0 @@
-type: folder
-name: customer-credit
-items:
-  - ref: ./Get customer credit calendar.request.yaml

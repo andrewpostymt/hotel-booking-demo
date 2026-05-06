@@ -1,6 +1,0 @@
-type: folder
-name: '{confirmationNumber}'
-items:
-  - ref: ./Retrieve reservation.request.yaml
-  - ref: ./Modify reservation.request.yaml
-  - ref: ./Cancel reservation.request.yaml

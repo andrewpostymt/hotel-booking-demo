@@ -1,4 +1,0 @@
-type: folder
-name: grid
-items:
-  - ref: ./Get availability grid.request.yaml

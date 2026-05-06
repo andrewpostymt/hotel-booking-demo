@@ -1,4 +1,0 @@
-type: folder
-name: health
-items:
-  - ref: ./Health check.request.yaml

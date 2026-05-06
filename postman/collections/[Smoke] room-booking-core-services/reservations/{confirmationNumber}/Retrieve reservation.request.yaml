@@ -1,10 +1,8 @@
 $kind: http-request
-name: Retrieve reservation
 url: '{{baseUrl}}/reservations/:confirmationNumber'
 method: GET
 headers:
-  - key: Accept
-    value: application/json
+  Accept: application/json
 pathVariables:
   - key: confirmationNumber
     value: HOTEL-2026-884421
